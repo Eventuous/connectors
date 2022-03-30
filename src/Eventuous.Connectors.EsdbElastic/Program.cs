@@ -39,7 +39,7 @@ var indexName        = Ensure.NotEmptyString(dataStreamConfig.IndexName);
 
 new ConnectorBuilder()
     .SubscribeWith<AllStreamSubscription, AllStreamSubscriptionOptions>(
-        Ensure.NotEmptyString(config.ConnectorId)
+        Ensure.NotEmptyString(config.Connector.ConnectorId)
     )
     .ConfigureSubscriptionOptions(
         cfg => {

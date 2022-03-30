@@ -7,19 +7,19 @@ using Serilog;
 namespace Eventuous.Connectors.EsdbElastic.Index;
 
 public static class SetupIndex {
-    static AsyncPolicy retryPolicy = Polly.Policy
+    static readonly AsyncPolicy RetryPolicy = Polly.Policy
         .Handle<ElasticsearchClientException>()
         .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-            (exception, span, retry) => {
-                Log.Warning(exception, "Elasticsearch exception encountered. Retrying in {TimeSpan}", span);
+            (_, span, _) => {
+                Log.Warning("Elasticsearch exception encountered. Retrying in {TimeSpan}", span);
             });
     
     public static async Task CreateIfNecessary(IElasticClient client, IndexConfig config) {
         var lifecycleConfig = Ensure.NotNull(config.Lifecycle, nameof(config.Lifecycle));
         var templateConfig  = Ensure.NotNull(config.Template, nameof(config.Template));
 
-        await retryPolicy.ExecuteAsync(CreateLifecycle);
-        await retryPolicy.ExecuteAsync(CreateTemplate);
+        await RetryPolicy.ExecuteAsync(CreateLifecycle);
+        await RetryPolicy.ExecuteAsync(CreateTemplate);
 
         async Task CreateLifecycle() {
             Log.Information("Checking if lifecycle {LifecycleName} exists", lifecycleConfig.PolicyName);

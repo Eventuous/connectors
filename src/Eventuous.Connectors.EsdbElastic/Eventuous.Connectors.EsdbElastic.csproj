@@ -4,7 +4,7 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <EventuousVersion>0.6.4-alpha.0.1</EventuousVersion>
+        <EventuousVersion>0.6.4-alpha.0.3</EventuousVersion>
     </PropertyGroup>
 
     <ItemGroup>
