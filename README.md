@@ -20,7 +20,7 @@ The connector section just needs one parameter - the connector id. This connecto
 
 ```yaml
 connector:
-  subscriptionId: "esdb-elastic-connector"
+  connectorId: "esdb-elastic-connector"
 ```
 
 If you run multiple instances of the connector, you should use different connector ids.

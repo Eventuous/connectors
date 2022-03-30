@@ -18,17 +18,22 @@ public static class SetupIndex {
         var lifecycleConfig = Ensure.NotNull(config.Lifecycle, nameof(config.Lifecycle));
         var templateConfig  = Ensure.NotNull(config.Template, nameof(config.Template));
 
-        await CreateLifecycle();
-        await CreateTemplate();
+        await retryPolicy.ExecuteAsync(CreateLifecycle);
+        await retryPolicy.ExecuteAsync(CreateTemplate);
 
         async Task CreateLifecycle() {
+            Log.Information("Checking if lifecycle {LifecycleName} exists", lifecycleConfig.PolicyName);
             var getLifecycleResponse =
                 await client.IndexLifecycleManagement.GetLifecycleAsync(
                     x => x.PolicyId(Ensure.NotEmptyString(lifecycleConfig.PolicyName))
                 );
 
-            if (getLifecycleResponse.Policies.ContainsKey(lifecycleConfig.PolicyName)) return;
+            if (getLifecycleResponse.Policies.ContainsKey(lifecycleConfig.PolicyName)) {
+                Log.Information("Lifecycle {LifecycleName} exists", lifecycleConfig.PolicyName);
+                return;
+            }
 
+            Log.Information("Creating lifecycle {LifecycleName}", lifecycleConfig.PolicyName);
             var lifecycleResponse = await client.IndexLifecycleManagement.PutLifecycleAsync(
                 lifecycleConfig.PolicyName,
                 p => p.Policy(
@@ -45,13 +50,18 @@ public static class SetupIndex {
         }
 
         async Task CreateTemplate() {
+            Log.Information("Checking if template {TemplateName} exists", templateConfig.TemplateName);
             var templateExists =
                 await client.LowLevel.Indices.TemplateV2ExistsForAllAsync<IndexTemplateV2ExistsResponse>(
                     Ensure.NotEmptyString(templateConfig.TemplateName)
                 );
 
-            if (templateExists.Exists) return;
+            if (templateExists.Exists) {
+                Log.Information("Template {TemplateName} exists", templateConfig.TemplateName);
+                return;
+            }
 
+            Log.Information("Creating template {TemplateName}", templateConfig.TemplateName);
             var templateResponse = await client.LowLevel.Indices.PutTemplateV2ForAllAsync<StringResponse>(
                 templateConfig.TemplateName,
                 PostData.Serializable(

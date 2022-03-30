@@ -1,5 +1,5 @@
 connector:
-  subscriptionId: "esdb-elastic-connector"
+  connectorId: "esdb-elastic-connector"
 source:
   connectionString: "esdb://localhost:2113?tls=false"
   concurrencyLimit: 1
