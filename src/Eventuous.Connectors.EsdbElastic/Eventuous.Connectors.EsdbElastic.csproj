@@ -12,6 +12,7 @@
         <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.ElasticSearch" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
+        <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
         <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.ElasticsearchClient" Version="1.0.0-beta2" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.2.0-rc3" />

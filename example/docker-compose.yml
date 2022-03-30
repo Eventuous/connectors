@@ -127,12 +127,16 @@ services:
       EVENTSTORE_RUN_PROJECTIONS: all
       EVENTSTORE_START_STANDARD_PROJECTIONS: "true"
       EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP: "true"
+    networks:
+      - elastic
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
       - "9411:9411"
+    networks:
+      - elastic
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib
@@ -147,6 +151,8 @@ services:
       - "55679:55679"
     depends_on:
       - jaeger
+    networks:
+      - elastic
 
   prometheus:
     container_name: prometheus
@@ -155,6 +161,8 @@ services:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+    networks:
+      - elastic
 
   connector:
     image: eventuous/connector-esdb-elastic:main
@@ -167,6 +175,8 @@ services:
     depends_on:
       - es01
       - esdb
+    networks:
+      - elastic
 
 volumes:
   hot_data:
