@@ -23,7 +23,7 @@ services:
       - hot_data:/usr/share/elasticsearch/data
       - snapshots:/usr/share/elasticsearch/snapshots
     ports:
-      - 9200:9200
+      - "9200:9200"
     networks:
       - elastic
   
@@ -138,7 +138,7 @@ services:
     image: otel/opentelemetry-collector-contrib
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:
-      - ./example/otel-collector-config.yaml:/etc/otel-collector-config.yml
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yml
     ports:
       - "1888:1888"
       - "13133:13133"
@@ -146,6 +146,21 @@ services:
       - "55679:55679"
     depends_on:
       - jaeger
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  connector:
+    image: eventuous/connector-esdb-elastic:main
+    volumes:
+      - ./config.yaml:/app/config.yaml
+    ports:
+      - "5001:5000"
 
 volumes:
   hot_data:
