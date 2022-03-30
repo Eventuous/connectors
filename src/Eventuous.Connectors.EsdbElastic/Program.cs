@@ -4,11 +4,15 @@ using Eventuous.Connectors.EsdbElastic.Config;
 using Eventuous.Connectors.EsdbElastic.Conversions;
 using Eventuous.Connectors.EsdbElastic.Index;
 using Eventuous.Connectors.EsdbElastic.Infrastructure;
+using Eventuous.Diagnostics.OpenTelemetry;
 using Eventuous.ElasticSearch.Producers;
 using Eventuous.ElasticSearch.Projections;
 using Eventuous.EventStore.Subscriptions;
 using Eventuous.Subscriptions.Registrations;
 using Nest;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 TypeMap.RegisterKnownEventTypes();
 var builder = WebApplication.CreateBuilder();
@@ -31,7 +35,7 @@ builder.Services
     .AddElasticClient(config.Target.ConnectionString, config.Target.CloudId, config.Target.ApiKey);
 
 var concurrencyLimit = config.Source.ConcurrencyLimit;
-var indexName        = dataStreamConfig.IndexName;
+var indexName        = Ensure.NotEmptyString(dataStreamConfig.IndexName);
 
 new ConnectorBuilder()
     .SubscribeWith<AllStreamSubscription, AllStreamSubscriptionOptions>(
@@ -55,4 +59,26 @@ new ConnectorBuilder()
 
 builder.AddStartupJob<IElasticClient, IndexConfig>(SetupIndex.CreateIfNecessary);
 
-await builder.GetHost().RunConnector();
+const string serviceName = "eventuous-connector-esdb-elastic";
+
+builder.Services.AddOpenTelemetryTracing(
+    cfg => {
+        cfg
+            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName))
+            .SetSampler(new TraceIdRatioBasedSampler(1))
+            .AddGrpcClientInstrumentation()
+            .AddElasticsearchClientInstrumentation()
+            .AddEventuousTracing()
+            .AddOtlpExporter();
+    }
+);
+
+builder.Services.AddOpenTelemetryMetrics(
+    cfg => cfg
+        .AddEventuous()
+        .AddEventuousSubscriptions()
+        .AddPrometheusExporter()
+);
+var app = builder.GetHost();
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
+await app.RunConnector();
