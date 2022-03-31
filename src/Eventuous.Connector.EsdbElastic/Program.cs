@@ -1,9 +1,9 @@
 using Eventuous;
 using Eventuous.Connectors.Base;
-using Eventuous.Connectors.EsdbElastic.Config;
-using Eventuous.Connectors.EsdbElastic.Conversions;
-using Eventuous.Connectors.EsdbElastic.Index;
-using Eventuous.Connectors.EsdbElastic.Infrastructure;
+using Eventuous.Connector.EsdbElastic.Config;
+using Eventuous.Connector.EsdbElastic.Conversions;
+using Eventuous.Connector.EsdbElastic.Index;
+using Eventuous.Connector.EsdbElastic.Infrastructure;
 using Eventuous.Diagnostics.OpenTelemetry;
 using Eventuous.ElasticSearch.Producers;
 using Eventuous.ElasticSearch.Projections;

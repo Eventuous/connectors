@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Elasticsearch.Net;
 
-namespace Eventuous.Connectors.EsdbElastic.Conversions;
+namespace Eventuous.Connector.EsdbElastic.Conversions;
 
 class ElasticSerializer : IElasticsearchSerializer {
     readonly        IElasticsearchSerializer _builtIn;

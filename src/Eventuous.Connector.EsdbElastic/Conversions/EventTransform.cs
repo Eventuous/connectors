@@ -3,7 +3,7 @@ using Eventuous.ElasticSearch.Producers;
 using Eventuous.Gateway;
 using Eventuous.Subscriptions.Context;
 
-namespace Eventuous.Connectors.EsdbElastic.Conversions;
+namespace Eventuous.Connector.EsdbElastic.Conversions;
 
 public class EventTransform : IGatewayTransform<ElasticProduceOptions> {
     readonly string _indexName;

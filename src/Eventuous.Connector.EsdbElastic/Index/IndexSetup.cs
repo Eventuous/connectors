@@ -1,10 +1,10 @@
 using Elasticsearch.Net;
-using Eventuous.Connectors.EsdbElastic.Conversions;
+using Eventuous.Connector.EsdbElastic.Conversions;
 using Nest;
 using Polly;
 using Serilog;
 
-namespace Eventuous.Connectors.EsdbElastic.Index;
+namespace Eventuous.Connector.EsdbElastic.Index;
 
 public static class SetupIndex {
     static readonly AsyncPolicy RetryPolicy = Polly.Policy

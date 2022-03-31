@@ -1,6 +1,6 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace Eventuous.Connectors.EsdbElastic.Index;
+namespace Eventuous.Connector.EsdbElastic.Index;
 
 public record IndexConfig {
     public string?                   IndexName { get; init; }

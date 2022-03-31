@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2EEAA8CF-E866-48FA-84EB-41BC98798393}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connectors.EsdbElastic", "src\Eventuous.Connectors.EsdbElastic\Eventuous.Connectors.EsdbElastic.csproj", "{790F7464-BB73-44D0-B0AF-5AD5EA687DAE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.EsdbElastic", "src\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj", "{790F7464-BB73-44D0-B0AF-5AD5EA687DAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

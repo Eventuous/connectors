@@ -1,9 +1,9 @@
 ﻿using Elasticsearch.Net;
-using Eventuous.Connectors.EsdbElastic.Conversions;
+using Eventuous.Connector.EsdbElastic.Conversions;
 using Nest;
 using static System.String;
 
-namespace Eventuous.Connectors.EsdbElastic.Infrastructure;
+namespace Eventuous.Connector.EsdbElastic.Infrastructure;
 
 static class RegistrationExtensions {
     public static IServiceCollection AddElasticClient(
