@@ -6,7 +6,8 @@ using Serilog;
 
 namespace Eventuous.Connector.EsdbElastic.Index;
 
-public static class SetupIndex {
+public static class SetupIndex<T> where T : class {
+    // ReSharper disable once StaticMemberInGenericType
     static readonly AsyncPolicy RetryPolicy = Polly.Policy
         .Handle<ElasticsearchClientException>()
         .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
@@ -76,7 +77,7 @@ public static class SetupIndex {
                                     number_of_replicas = templateConfig.NumberOrReplicas
                                 }
                             },
-                            mappings = new TypeMappingDescriptor<PersistedEvent>().AutoMap()
+                            mappings = new TypeMappingDescriptor<T>().AutoMap()
                         }
                     }
                 )

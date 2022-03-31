@@ -16,14 +16,18 @@ The config file consists of three sections:
 
 ### Connector configuration
 
-The connector section just needs one parameter - the connector id. This connector uses the connector id also as the checkpoint id.
+The connector section requires one parameter - the connector id. This connector uses the connector id also as the checkpoint id.
 
 ```yaml
 connector:
   connectorId: "esdb-elastic-connector"
+  diagnostics:
+    enabled: true
 ```
 
 If you run multiple instances of the connector, you should use different connector ids.
+
+If you want to enable diagnostics, you need to configure the `diagnostics` [section](#diagnotics-configuration).
 
 ### Source configuration
 
@@ -72,6 +76,35 @@ The `tier` section is used to configure the rollover policy tiers. The tier name
     * `maxNumSegments` - the maximum number of segments
 * `readOnly` - if the tier will be read only
 * `delete` - if the tier will be deleted
+
+### Diagnotics configuration
+
+The connector is fully instrumented with traces and metrics. The following configuration parameters are supported:
+
+* `enabled` - if diagnostics are enabled
+* `tracing` - the tracing configuration
+    * `enabled` - if tracing is enabled
+    * `exporters` - the tracing exporters (zipkin, jaeger, otpl)
+* `metrics` - the metrics configuration
+    * `enabled` - if metrics are enabled
+    * `exporters` - the metrics exporters (prometheus, otpl)
+
+Example:
+
+```yaml
+connector:
+  connectorId: "esdb-elastic-connector"
+  diagnostics:
+    tracing:
+      enabled: true
+      exporters: [zipkin]
+    metrics:
+      enabled: true
+      exporters: [prometheus]
+    traceSamplerProbability: 0
+```
+
+There's no way to configure the exporters by now (endpoints, etc), but they accept the usual environment variables.
 
 ## Data in Elasticsearch
 

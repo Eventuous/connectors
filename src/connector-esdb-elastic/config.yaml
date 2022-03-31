@@ -1,5 +1,13 @@
 connector:
   connectorId: "esdb-elastic-connector"
+  diagnostics:
+    tracing:
+      enabled: true
+      exporters: [zipkin]
+    metrics:
+      enabled: true
+      exporters: [prometheus]
+    traceSamplerProbability: 0
 source:
   connectionString: "esdb://localhost:2113?tls=false"
   concurrencyLimit: 1

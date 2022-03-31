@@ -1,11 +1,12 @@
 using System.Text.Json;
 using Elasticsearch.Net;
 
-namespace Eventuous.Connector.EsdbElastic.Conversions;
+namespace connector_esdb_elastic;
 
 class ElasticSerializer : IElasticsearchSerializer {
-    readonly        IElasticsearchSerializer _builtIn;
-    static readonly JsonSerializerOptions    Options = new(JsonSerializerDefaults.Web);
+    readonly IElasticsearchSerializer _builtIn;
+
+    static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web);
 
     public ElasticSerializer(IElasticsearchSerializer builtIn) => _builtIn = builtIn;
 
@@ -13,13 +14,17 @@ class ElasticSerializer : IElasticsearchSerializer {
 
     public T Deserialize<T>(Stream stream) => _builtIn.Deserialize<T>(stream);
 
-    public Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = new())
+    public Task<object> DeserializeAsync(
+        Type type, Stream stream, CancellationToken cancellationToken = new()
+    )
         => _builtIn.DeserializeAsync(type, stream, cancellationToken);
 
     public Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = new())
         => _builtIn.DeserializeAsync<T>(stream, cancellationToken);
 
-    public void Serialize<T>(T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None) {
+    public void Serialize<T>(
+        T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None
+    ) {
         if (data is not PersistedEvent persistedEvent) {
             _builtIn.Serialize(data, stream, formatting);
             return;
@@ -27,7 +32,7 @@ class ElasticSerializer : IElasticsearchSerializer {
 
         var payload = persistedEvent.Message as byte[];
 
-        using var doc    = JsonSerializer.SerializeToDocument(persistedEvent with { Message = null }, Options);
+        using var doc = JsonSerializer.SerializeToDocument(persistedEvent with { Message = null }, Options);
         using var writer = new Utf8JsonWriter(stream);
         writer.WriteStartObject();
 

@@ -1,7 +1,8 @@
+using Eventuous;
 using Eventuous.Connectors.Base;
 using Nest;
 
-namespace Eventuous.Connector.EsdbElastic.Conversions;
+namespace connector_esdb_elastic;
 
 class ElasticMeta {
     public static Dictionary<string, string?>? FromMetadata(Metadata? metadata)

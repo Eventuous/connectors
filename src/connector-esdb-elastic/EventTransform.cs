@@ -1,9 +1,10 @@
+using Eventuous;
 using Eventuous.Connectors.Base;
 using Eventuous.ElasticSearch.Producers;
 using Eventuous.Gateway;
 using Eventuous.Subscriptions.Context;
 
-namespace Eventuous.Connector.EsdbElastic.Conversions;
+namespace connector_esdb_elastic;
 
 public class EventTransform : IGatewayTransform<ElasticProduceOptions> {
     readonly string _indexName;

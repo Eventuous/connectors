@@ -4,6 +4,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2EEAA8CF-E86
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.EsdbElastic", "src\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj", "{790F7464-BB73-44D0-B0AF-5AD5EA687DAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "connector-esdb-elastic", "src\connector-esdb-elastic\connector-esdb-elastic.csproj", "{B2FAB98D-99FE-49B1-B8F9-DF5C86D35DCF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -11,11 +13,16 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{790F7464-BB73-44D0-B0AF-5AD5EA687DAE} = {2EEAA8CF-E866-48FA-84EB-41BC98798393}
+		{B2FAB98D-99FE-49B1-B8F9-DF5C86D35DCF} = {2EEAA8CF-E866-48FA-84EB-41BC98798393}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{790F7464-BB73-44D0-B0AF-5AD5EA687DAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{790F7464-BB73-44D0-B0AF-5AD5EA687DAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{790F7464-BB73-44D0-B0AF-5AD5EA687DAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{790F7464-BB73-44D0-B0AF-5AD5EA687DAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2FAB98D-99FE-49B1-B8F9-DF5C86D35DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2FAB98D-99FE-49B1-B8F9-DF5C86D35DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2FAB98D-99FE-49B1-B8F9-DF5C86D35DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2FAB98D-99FE-49B1-B8F9-DF5C86D35DCF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

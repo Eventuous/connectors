@@ -138,22 +138,6 @@ services:
     networks:
       - elastic
 
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib
-    command: ["--config=/etc/otel-collector-config.yml"]
-    volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yml
-    ports:
-      - "1888:1888"
-      - "13133:13133"
-      - "9411"
-      - "4317"
-      - "55679:55679"
-    depends_on:
-      - jaeger
-    networks:
-      - elastic
-
   prometheus:
     container_name: prometheus
     image: prom/prometheus:latest
@@ -168,8 +152,6 @@ services:
     image: eventuous/connector-esdb-elastic:main
     volumes:
       - ./config.yaml:/app/config.yaml
-    environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
     ports:
       - "5001:5000"
     depends_on:
