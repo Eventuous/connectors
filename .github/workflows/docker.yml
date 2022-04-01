@@ -6,9 +6,12 @@ on:
       - '**'
     tags:
       - '*.*.*'
+    paths-ignore:
+      - '**.md'
+      - '**.yaml'
   pull_request:
     branches:
-      - 'master'
+      - 'main'
 
 jobs:
   docker:

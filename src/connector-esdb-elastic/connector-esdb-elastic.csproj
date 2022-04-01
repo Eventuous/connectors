@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <RootNamespace>connector_esdb_elastic</RootNamespace>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>

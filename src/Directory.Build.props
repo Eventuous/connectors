@@ -5,4 +5,28 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <EventuousVersion>0.6.4-alpha.0.12</EventuousVersion>
     </PropertyGroup>
+    
+    <ItemGroup Condition="'$(IsTestProject)' != 'true'">
+        <PackageReference Include="MinVer" Version="3.1.0" PrivateAssets="All"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+        <Using Include="JetBrains.Annotations"/>
+        <Using Include="Eventuous"/>
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(IsTestProject)' != 'true'">
+        <IsPackable>true</IsPackable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <UpdateVersionProperties>true</UpdateVersionProperties>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <PackageIconUrl>https://eventuous.dev/images/e-logo.png</PackageIconUrl>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/eventuous/Eventuous.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <Description>Eventuous connector between EventStoreDB and Elasticsearch</Description>
+        <Authors>Alexey Zimarev</Authors>
+        <Copyright>Ubiquitous AS</Copyright>
+        <PackageProjectUrl>https://eventuous.dev</PackageProjectUrl>
+    </PropertyGroup>
 </Project>
