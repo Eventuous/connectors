@@ -23,7 +23,7 @@ services:
       - hot_data:/usr/share/elasticsearch/data
       - snapshots:/usr/share/elasticsearch/snapshots
     ports:
-      - 9200:9200
+      - "9200:9200"
     networks:
       - elastic
   
@@ -145,7 +145,7 @@ services:
       - "9411"
       - "55679:55679"
     depends_on:
-      - jaeger
+      - zipkin
 
 volumes:
   hot_data:

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Elasticsearch.Net;
+using Eventuous.ElasticSearch.Store;
 
 namespace connector_esdb_elastic;
 

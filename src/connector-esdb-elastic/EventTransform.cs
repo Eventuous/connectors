@@ -1,6 +1,6 @@
-using Eventuous;
-using Eventuous.Connectors.Base;
+using Eventuous.Connector.EsdbElastic.Conversions;
 using Eventuous.ElasticSearch.Producers;
+using Eventuous.ElasticSearch.Store;
 using Eventuous.Gateway;
 using Eventuous.Subscriptions.Context;
 
@@ -27,13 +27,13 @@ public class EventTransform : IGatewayTransform<ElasticProduceOptions> {
     static PersistedEvent FromContext(IMessageConsumeContext ctx)
         => new(
             ctx.MessageId,
-            VersionParser.Parse(ctx.MessageType),
+            ctx.MessageType,
             ctx.StreamPosition,
             ctx.ContentType,
             ctx.Stream,
             ctx.GlobalPosition,
             ctx.Message,
-            ElasticMeta.FromMetadata(ctx.Metadata),
+            ElasticMetadata.FromMetadata(ctx.Metadata),
             ctx.Created
         );
 }

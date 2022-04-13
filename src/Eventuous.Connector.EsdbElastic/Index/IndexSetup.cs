@@ -1,5 +1,4 @@
 using Elasticsearch.Net;
-using Eventuous.Connector.EsdbElastic.Conversions;
 using Nest;
 using Polly;
 using Serilog;

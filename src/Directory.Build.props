@@ -3,7 +3,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <EventuousVersion>0.6.4-alpha.0.12</EventuousVersion>
+        <EventuousVersion>0.7.0</EventuousVersion>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(IsTestProject)' != 'true'">
