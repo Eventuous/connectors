@@ -1,9 +1,9 @@
 using Elasticsearch.Net;
 using Eventuous.Connector.EsdbElastic.Config;
 using Eventuous.Connector.EsdbElastic.Conversions;
-using Eventuous.Connector.EsdbElastic.Index;
 using Eventuous.Connector.EsdbElastic.Infrastructure;
 using Eventuous.Connectors.Base;
+using Eventuous.ElasticSearch.Index;
 using Eventuous.ElasticSearch.Producers;
 using Eventuous.ElasticSearch.Projections;
 using Eventuous.EventStore.Subscriptions;
@@ -33,7 +33,7 @@ public static class Startup {
                 config.Target.ApiKey,
                 getSerializer
             );
-        services.AddStartupJob<IElasticClient, IndexConfig>(SetupIndex<T>.CreateIfNecessary);
+        services.AddStartupJob<IElasticClient, IndexConfig>(SetupIndex.CreateIndexIfNecessary<T>);
     }
 
     public static ConnectorBuilder<

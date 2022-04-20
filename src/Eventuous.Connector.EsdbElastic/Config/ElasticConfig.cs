@@ -1,4 +1,4 @@
-using Eventuous.Connector.EsdbElastic.Index;
+using Eventuous.ElasticSearch.Index;
 
 namespace Eventuous.Connector.EsdbElastic.Config;
 
