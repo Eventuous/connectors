@@ -120,7 +120,7 @@ You can optimise the rollover policy to keep the index size optimal, as well as 
 Events are replicated to Elasticsearch in the following format:
 
 * `messageId` - the unique identifier of the event 
-* `messageType` - the type of the event, represented in a complex structure (see below)
+* `messageType` - the type of the event
 * `streamPosition` - event position in the original stream
 * `stream` - original stream name
 * `globalPosition` - position of the event in the global stream (`$all`)
@@ -128,7 +128,3 @@ Events are replicated to Elasticsearch in the following format:
 * `metadata` - flattened event metadata
 * `@timestamp` - the timestamp of the event
 
-The `messageType` field is a JSON object that contains the following fields:
-* `version` - the version of the event type
-* `type` - the name of the event type
-* `originalType` - the original name of the event type
