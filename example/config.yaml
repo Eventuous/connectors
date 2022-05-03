@@ -1,5 +1,6 @@
 connector:
   connectorId: "esdb-elastic-connector"
+  connectorAssembly: "Eventuous.Connector.EsdbElastic"
   diagnostics:
     tracing:
       enabled: true

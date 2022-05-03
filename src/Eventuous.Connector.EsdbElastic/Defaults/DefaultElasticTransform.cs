@@ -4,26 +4,28 @@ using Eventuous.ElasticSearch.Store;
 using Eventuous.Gateway;
 using Eventuous.Subscriptions.Context;
 
-namespace connector_esdb_elastic;
+namespace Eventuous.Connector.EsdbElastic.Defaults;
 
-public class EventTransform : IGatewayTransform<ElasticProduceOptions> {
+public class DefaultElasticTransform : IGatewayTransform<ElasticProduceOptions> {
     readonly string _indexName;
 
     static readonly ElasticProduceOptions Options = new() { ProduceMode = ProduceMode.Create };
 
-    public EventTransform(string indexName) => _indexName = indexName;
+    public DefaultElasticTransform(string indexName) => _indexName = indexName;
 
-    public ValueTask<GatewayContext<ElasticProduceOptions>?> RouteAndTransform(IMessageConsumeContext context) {
-        var ctx = new GatewayContext<ElasticProduceOptions>(
+    public ValueTask<GatewayMessage<ElasticProduceOptions>[]> RouteAndTransform(
+        IMessageConsumeContext context
+    ) {
+        var gatewayMessage = new GatewayMessage<ElasticProduceOptions>(
             new StreamName(_indexName),
             FromContext(context),
             null,
             Options
         );
 
-        return new ValueTask<GatewayContext<ElasticProduceOptions>?>(ctx);
+        return new ValueTask<GatewayMessage<ElasticProduceOptions>[]>(new[] { gatewayMessage });
     }
-    
+
     static PersistedEvent FromContext(IMessageConsumeContext ctx)
         => new(
             ctx.MessageId,

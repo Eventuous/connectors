@@ -2,7 +2,7 @@ using Elasticsearch.Net;
 using Eventuous.Connector.EsdbElastic.Config;
 using Eventuous.Connector.EsdbElastic.Conversions;
 using Eventuous.Connector.EsdbElastic.Infrastructure;
-using Eventuous.Connectors.Base;
+using Eventuous.Connector.Base;
 using Eventuous.ElasticSearch.Index;
 using Eventuous.ElasticSearch.Producers;
 using Eventuous.ElasticSearch.Projections;

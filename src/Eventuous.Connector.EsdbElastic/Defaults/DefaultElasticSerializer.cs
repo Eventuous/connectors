@@ -2,25 +2,25 @@ using System.Text.Json;
 using Elasticsearch.Net;
 using Eventuous.ElasticSearch.Store;
 
-namespace connector_esdb_elastic;
+namespace Eventuous.Connector.EsdbElastic.Defaults;
 
-class ElasticSerializer : IElasticsearchSerializer {
+public class DefaultElasticSerializer : IElasticsearchSerializer {
     readonly IElasticsearchSerializer _builtIn;
 
     static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web);
 
-    public ElasticSerializer(IElasticsearchSerializer builtIn) => _builtIn = builtIn;
+    public DefaultElasticSerializer(IElasticsearchSerializer builtIn) => _builtIn = builtIn;
 
     public object Deserialize(Type type, Stream stream) => _builtIn.Deserialize(type, stream);
 
     public T Deserialize<T>(Stream stream) => _builtIn.Deserialize<T>(stream);
 
     public Task<object> DeserializeAsync(
-        Type type, Stream stream, CancellationToken cancellationToken = new()
+        Type type, Stream stream, CancellationToken cancellationToken = default
     )
         => _builtIn.DeserializeAsync(type, stream, cancellationToken);
 
-    public Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = new())
+    public Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         => _builtIn.DeserializeAsync<T>(stream, cancellationToken);
 
     public void Serialize<T>(
@@ -58,7 +58,7 @@ class ElasticSerializer : IElasticsearchSerializer {
         T                       data,
         Stream                  stream,
         SerializationFormatting formatting        = SerializationFormatting.None,
-        CancellationToken       cancellationToken = new()
+        CancellationToken       cancellationToken = default
     ) {
         Serialize(data, stream, formatting);
         return Task.CompletedTask;
