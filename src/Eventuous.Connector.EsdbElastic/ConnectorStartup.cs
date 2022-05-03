@@ -1,21 +1,66 @@
 using Elasticsearch.Net;
 using Eventuous.Connector.EsdbElastic.Config;
+using Eventuous.Connector.EsdbElastic.Defaults;
+using Eventuous.Connector.Base;
+using Eventuous.Connector.Base.App;
+using Eventuous.Connector.Base.Config;
+using Eventuous.Connector.Base.Diag;
 using Eventuous.Connector.EsdbElastic.Conversions;
 using Eventuous.Connector.EsdbElastic.Infrastructure;
-using Eventuous.Connector.Base;
 using Eventuous.ElasticSearch.Index;
 using Eventuous.ElasticSearch.Producers;
 using Eventuous.ElasticSearch.Projections;
+using Eventuous.ElasticSearch.Store;
 using Eventuous.EventStore.Subscriptions;
 using Eventuous.Gateway;
 using Eventuous.Subscriptions.Registrations;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 
 namespace Eventuous.Connector.EsdbElastic;
 
-public static class Startup {
-    public static void Register<T>(
+[UsedImplicitly]
+public class ConnectorStartup : IConnectorStartup {
+    public ConnectorApp BuildConnectorApp(
+        string configFile,
+        ExporterMappings<TracerProviderBuilder> tracingExporters,
+        ExporterMappings<MeterProviderBuilder>  metricsExporters
+    ) {
+        var builder = ConnectorApp
+            .Create<EsdbConfig, ElasticConfig>(configFile)
+            .RegisterDependencies(
+                (services, config) => Register<PersistedEvent>(
+                    services,
+                    config,
+                    def => new DefaultElasticSerializer(def)
+                )
+            )
+            .RegisterConnector(
+                (cfg, config) => {
+                    var indexName = Ensure.NotEmptyString(config.Target.DataStream?.IndexName);
+
+                    return ConfigureConnector(
+                        cfg,
+                        config,
+                        _ => new DefaultElasticTransform(indexName)
+                    );
+                }
+            )
+            .AddOpenTelemetry(
+                (cfg, enrich) =>
+                    cfg
+                        .AddGrpcClientInstrumentation(options => options.Enrich = enrich)
+                        .AddElasticsearchClientInstrumentation(options => options.Enrich = enrich),
+                tracingExporters: tracingExporters,
+                metricsExporters: metricsExporters
+            );
+
+        return builder.Build();
+    }
+
+    static void Register<T>(
         IServiceCollection                                       services,
         ConnectorConfig<EsdbConfig, ElasticConfig>               config,
         Func<IElasticsearchSerializer, IElasticsearchSerializer> getSerializer
@@ -36,7 +81,7 @@ public static class Startup {
         services.AddStartupJob<IElasticClient, IndexConfig>(SetupIndex.CreateIndexIfNecessary<T>);
     }
 
-    public static ConnectorBuilder<
+    static ConnectorBuilder<
             AllStreamSubscription, AllStreamSubscriptionOptions,
             ElasticProducer, ElasticProduceOptions>
         ConfigureConnector(

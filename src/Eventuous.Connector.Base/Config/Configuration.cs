@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 
-namespace Eventuous.Connector.Base;
+namespace Eventuous.Connector.Base.Config;
 
 public static class Configuration {
-    public static IConfigurationBuilder AddConfiguration(this WebApplicationBuilder builder)
-        => builder.Configuration.AddYamlFile("config.yaml", false, true).AddEnvironmentVariables();
+    public static IConfigurationBuilder AddConfiguration(this WebApplicationBuilder builder, string configFile)
+        => builder.Configuration.AddYamlFile(configFile, false, true).AddEnvironmentVariables();
 
     public static ConnectorConfig<TSource, TTarget>
         GetConnectorConfig<TSource, TTarget>(this IConfiguration configuration)

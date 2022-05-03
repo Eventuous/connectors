@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Eventuous.Connector.Base.Config;
+using Eventuous.Connector.Base.Diag;
 using Eventuous.Diagnostics;
 using Eventuous.Diagnostics.OpenTelemetry;
 using Eventuous.Producers;
@@ -12,7 +14,7 @@ using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 
-namespace Eventuous.Connector.Base;
+namespace Eventuous.Connector.Base.App;
 
 public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig>
     where TSourceConfig : class
@@ -21,9 +23,9 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig>
     Func<LoggerSinkConfiguration, LoggerConfiguration>? _sinkConfiguration;
     Func<LoggerConfiguration, LoggerConfiguration>?     _configureLogger;
 
-    internal ConnectorApplicationBuilder() {
+    internal ConnectorApplicationBuilder(string configFile) {
         Builder = WebApplication.CreateBuilder();
-        Builder.AddConfiguration();
+        Builder.AddConfiguration(configFile);
         Config = Builder.Configuration.GetConnectorConfig<TSourceConfig, TTargetConfig>();
         Builder.Services.AddSingleton(Config.Source);
         Builder.Services.AddSingleton(Config.Target);
@@ -144,9 +146,10 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig>
 
 public class ConnectorApp {
     [PublicAPI]
-    public static ConnectorApplicationBuilder<TSourceConfig, TTargetConfig> Create<TSourceConfig, TTargetConfig>()
+    public static ConnectorApplicationBuilder<TSourceConfig, TTargetConfig> Create<TSourceConfig,
+        TTargetConfig>(string configFile)
         where TSourceConfig : class where TTargetConfig : class
-        => new();
+        => new(configFile);
 
     public WebApplication Host { get; }
 

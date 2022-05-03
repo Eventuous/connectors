@@ -1,7 +1,7 @@
-namespace Eventuous.Connector.Base;
+namespace Eventuous.Connector.Base.Diag;
 
 public class ExporterMappings<T> {
-    Dictionary<string, Action<T>> _mappings = new();
+    readonly Dictionary<string, Action<T>> _mappings = new();
 
     public ExporterMappings<T> Add(string name, Action<T> configure) {
         _mappings.Add(name, configure);

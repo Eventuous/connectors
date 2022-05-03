@@ -1,4 +1,4 @@
-namespace Eventuous.Connector.Base;
+namespace Eventuous.Connector.Base.Config;
 
 public record ConnectorConfig<TSource, TTarget> where TSource : class where TTarget : class {
     public ConnectorSettings Connector { get; init; } = new();

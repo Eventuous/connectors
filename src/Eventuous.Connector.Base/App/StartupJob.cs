@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Eventuous.Connector.Base;
+namespace Eventuous.Connector.Base.App;
 
 public interface IStartupJob {
     Task Run();

@@ -1,5 +1,8 @@
 using System.Reflection;
 using Eventuous.Connector.Base;
+using Eventuous.Connector.Base.App;
+using Eventuous.Connector.Base.Config;
+using Eventuous.Connector.Base.Diag;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -10,6 +13,7 @@ namespace Eventuous.Connector;
 public class StartupBuilder {
     ConnectorConfig? _config;
     ConnectorApp?    _app;
+    string?          _configFile;
 
     readonly Logger _log;
 
@@ -20,7 +24,8 @@ public class StartupBuilder {
 
     public StartupBuilder Configure(string configFile, string[] args) {
         _log.Information("Configuring connector using config file {configFile}", configFile);
-        
+
+        _configFile = configFile;
         var hostBuilder = Host.CreateDefaultBuilder(args);
         hostBuilder.ConfigureHostConfiguration(c => c.AddYamlFile(configFile));
         using var tempHost = hostBuilder.Build();
@@ -49,7 +54,7 @@ public class StartupBuilder {
         var assemblyFileName = _config.Connector.ConnectorAssembly.EndsWith("dll")
             ? _config.Connector.ConnectorAssembly
             : _config.Connector.ConnectorAssembly + ".dll";
-        
+
         _log.Information("Loading connector assembly {assemblyFileName}", assemblyFileName);
 
         var assembly = Assembly.LoadFrom(Path.Join(path, assemblyFileName));
@@ -61,10 +66,10 @@ public class StartupBuilder {
         }
 
         var startupInstance = Activator.CreateInstance(startup) as IConnectorStartup;
-        
+
         _log.Information("Building connector application");
 
-        _app = startupInstance!.BuildConnectorApp(tracingExporters, metricsExporters);
+        _app = startupInstance!.BuildConnectorApp(_configFile!, tracingExporters, metricsExporters);
 
         return this;
     }

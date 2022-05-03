@@ -5,7 +5,7 @@ using Serilog.Configuration;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 
-namespace Eventuous.Connector.Base;
+namespace Eventuous.Connector.Base.Diag;
 
 public static class Logging {
     public static void ConfigureSerilog(
