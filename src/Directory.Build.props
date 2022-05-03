@@ -3,13 +3,15 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <EventuousVersion>0.7.0</EventuousVersion>
+        <EventuousVersion>0.8.0</EventuousVersion>
+        <RepoRoot>$([System.IO.Directory]::GetParent($(MSBuildThisFileDirectory)).Parent.FullName)</RepoRoot>
     </PropertyGroup>
-    
+
     <ItemGroup Condition="'$(IsTestProject)' != 'true'">
         <PackageReference Include="MinVer" Version="3.1.0" PrivateAssets="All"/>
         <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" PrivateAssets="All"/>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+        <None Include="$(RepoRoot)\e-logo.png" Pack="true" PackagePath="\"/>
         <Using Include="JetBrains.Annotations"/>
         <Using Include="Eventuous"/>
     </ItemGroup>
@@ -28,5 +30,6 @@
         <Authors>Alexey Zimarev</Authors>
         <Copyright>Ubiquitous AS</Copyright>
         <PackageProjectUrl>https://eventuous.dev</PackageProjectUrl>
+        <PackageIcon>e-logo.png</PackageIcon>
     </PropertyGroup>
 </Project>

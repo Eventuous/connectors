@@ -4,10 +4,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Eventuous.Connectors.Base" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.ElasticSearch" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
+        <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.ElasticsearchClient" Version="1.0.0-beta2" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.0.0-rc9.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
     </ItemGroup>
 </Project>
