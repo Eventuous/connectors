@@ -7,32 +7,35 @@ namespace Eventuous.Connector.EsdbElastic.Infrastructure;
 
 static class ElasticRegistrationExtensions {
     public static IServiceCollection AddElasticClient(
-        this IServiceCollection                                  services,
-        string?                                                  connectionString,
-        string?                                                  cloudId,
-        string?                                                  apiKey,
-        Func<IElasticsearchSerializer, IElasticsearchSerializer> getSerializer,
-        Func<ConnectionSettings, ConnectionSettings>?            configureSettings = null
+        this IServiceCollection                                   services,
+        string?                                                   connectionString,
+        string?                                                   cloudId,
+        string?                                                   apiKey,
+        Func<IElasticsearchSerializer, IElasticsearchSerializer>? getSerializer = null,
+        Func<ConnectionSettings, ConnectionSettings>?             configureSettings = null
     )
         => services.AddSingleton<IElasticClient>(
             CreateElasticClient(connectionString, cloudId, apiKey, getSerializer, configureSettings)
         );
 
     static ElasticClient CreateElasticClient(
-        string?                                                  connectionString,
-        string?                                                  cloudId,
-        string?                                                  apiKey,
-        Func<IElasticsearchSerializer, IElasticsearchSerializer> getSerializer,
-        Func<ConnectionSettings, ConnectionSettings>?            configureSettings = null
+        string?                                                   connectionString,
+        string?                                                   cloudId,
+        string?                                                   apiKey,
+        Func<IElasticsearchSerializer, IElasticsearchSerializer>? getSerializer = null,
+        Func<ConnectionSettings, ConnectionSettings>?             configureSettings = null
     ) {
-        var settings = cloudId != null
-            ? new ConnectionSettings(cloudId, new ApiKeyAuthenticationCredentials(apiKey))
-            : new ConnectionSettings(
-                new SingleNodeConnectionPool(
-                    new Uri(Ensure.NotEmptyString(connectionString, "Elasticsearch connection string"))
-                ),
-                (def, _) => getSerializer(def)
+        var pool = cloudId != null
+            ? new CloudConnectionPool(cloudId, new ApiKeyAuthenticationCredentials(apiKey))
+            : new SingleNodeConnectionPool(
+                new Uri(Ensure.NotEmptyString(connectionString, "Elasticsearch connection string"))
             );
+
+        ConnectionSettings.SourceSerializerFactory? serializerFactory = getSerializer != null
+            ? (def, _) => getSerializer(def)
+            : null;
+
+        var settings = new ConnectionSettings(pool, serializerFactory);
 
         if (configureSettings is not null) settings = configureSettings(settings);
 

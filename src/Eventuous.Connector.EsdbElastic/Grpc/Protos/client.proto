@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package projection;
+option csharp_namespace = "Eventuous.Connector.EsdbElastic";
+
+import "Eventuous.Connector.Base/Grpc/Protos/project.proto";
+
+service Projection {
+  rpc Project (stream ProjectionContext) returns (stream ProjectionResult);
+}
+
+message Index {
+  string id = 1;
+  string document = 2;
+}
+
+message Update {
+  string id = 1;
+  string document = 2;
+}
+
+message UpdateScript {
+  string id = 1;
+  Script script = 2;
+}
+
+message Delete {
+  string id = 1;
+}
+
+message Script {
+  string lang = 1;
+  string source = 2;
+  string params = 3;
+}
+
+message ProjectionResult {
+  string eventId = 1;
+  oneof operation {
+    Ignore ignore = 2;
+    Index index = 3;
+    Update update = 4;
+    UpdateScript updateScript = 5;
+    Delete delete = 6;
+  }
+}

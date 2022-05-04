@@ -3,7 +3,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <EventuousVersion>0.8.0</EventuousVersion>
+        <EventuousVersion>0.8.1-alpha.0.3</EventuousVersion>
         <RepoRoot>$([System.IO.Directory]::GetParent($(MSBuildThisFileDirectory)).Parent.FullName)</RepoRoot>
     </PropertyGroup>
 

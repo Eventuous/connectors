@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.Base", "src\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj", "{81246B91-33BA-4CB6-97D7-44D299E5C6C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.Mongo", "src\Eventuous.Connector.Mongo\Eventuous.Connector.Mongo.csproj", "{EC5BB4ED-F56C-45E7-A634-EF014C157528}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,7 @@ Global
 		{790F7464-BB73-44D0-B0AF-5AD5EA687DAE} = {2EEAA8CF-E866-48FA-84EB-41BC98798393}
 		{B2FAB98D-99FE-49B1-B8F9-DF5C86D35DCF} = {2EEAA8CF-E866-48FA-84EB-41BC98798393}
 		{81246B91-33BA-4CB6-97D7-44D299E5C6C9} = {2EEAA8CF-E866-48FA-84EB-41BC98798393}
+		{EC5BB4ED-F56C-45E7-A634-EF014C157528} = {2EEAA8CF-E866-48FA-84EB-41BC98798393}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{790F7464-BB73-44D0-B0AF-5AD5EA687DAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -31,5 +34,9 @@ Global
 		{81246B91-33BA-4CB6-97D7-44D299E5C6C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81246B91-33BA-4CB6-97D7-44D299E5C6C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81246B91-33BA-4CB6-97D7-44D299E5C6C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC5BB4ED-F56C-45E7-A634-EF014C157528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC5BB4ED-F56C-45E7-A634-EF014C157528}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC5BB4ED-F56C-45E7-A634-EF014C157528}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC5BB4ED-F56C-45E7-A634-EF014C157528}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

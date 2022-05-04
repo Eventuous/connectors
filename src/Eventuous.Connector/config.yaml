@@ -14,8 +14,9 @@ source:
   concurrencyLimit: 1
 target:
   connectionString: "http://localhost:9200"
+  connectorMode: "project"
   dataStream:
-    indexName: "eventlog"
+    indexName: "test"
     template:
       templateName: "eventlog-template"
     lifecycle:
