@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Eventuous.Producers;
 using Microsoft.Extensions.Logging;
 using Nest;
+using static Eventuous.Connector.EsdbElastic.ProjectionResult;
 
 namespace Eventuous.Connector.EsdbElastic.Infrastructure;
 
@@ -30,37 +31,58 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
                 continue;
             }
 
-            switch (projectionResult.OperationCase) {
-                case ProjectionResult.OperationOneofCase.None:   break;
-                case ProjectionResult.OperationOneofCase.Ignore: break;
-                case ProjectionResult.OperationOneofCase.Index:
-                    _log.LogDebug("Indexing document with id {id} to {index}", projectionResult.Index.Id, index);
+            var resp = projectionResult.OperationCase switch {
+                OperationOneofCase.Index  => await Index(projectionResult.Index, indexName, cancellationToken),
+                OperationOneofCase.Update => await Update(projectionResult.Update, indexName, cancellationToken),
+                _ => new ElasticCallResponse(true, "")
+            };
 
-                    await _elasticClient.IndexAsync(
-                        new IndexRequest<object>(projectionResult.Index.Document, indexName, projectionResult.Index.Id),
-                        cancellationToken
-                    );
+            if (!resp.IsValid) {
+                _log.LogError(
+                    "Failed to update document {id} in {index} because {reason}",
+                    projectionResult.Update.Id,
+                    index,
+                    resp.DebugInformation
+                );
 
-                    break;
-                case ProjectionResult.OperationOneofCase.Update:
-                    _log.LogDebug("Updating document with id {id} to {index}", projectionResult.Update.Id, index);
-                    var response = await _elasticClient.UpdateAsync(
-                        new UpdateRequest<object, object>(indexName, projectionResult.Update.Id) {
-                            Doc = projectionResult.Update.Document
-                        },
-                        cancellationToken
-                    );
-
-                    if (!response.IsValid) {
-                        _log.LogError("Failed to update document {id} in {index} because {reason}", projectionResult.Update.Id, index, response.DebugInformation);
-                    }
-                    break;
-                case ProjectionResult.OperationOneofCase.UpdateScript: break;
-                case ProjectionResult.OperationOneofCase.Delete: break;
-                default: throw new ArgumentOutOfRangeException(nameof(projectionResult.OperationCase));
+                throw new InvalidOperationException("Failed to execute call to Elasticsearch");
             }
         }
     }
+
+    async Task<ElasticCallResponse> Index(
+        Index             operation,
+        IndexName         indexName,
+        CancellationToken cancellationToken
+    ) {
+        _log.LogDebug("Indexing document with id {id} to {index}", operation.Id, indexName);
+
+        var response = await _elasticClient.IndexAsync(
+            new IndexRequest<object>(operation.Document, indexName, operation.Id),
+            cancellationToken
+        );
+
+        return new ElasticCallResponse(response.IsValid, response.DebugInformation);
+    }
+
+    async Task<ElasticCallResponse> Update(
+        Update            operation,
+        IndexName         indexName,
+        CancellationToken cancellationToken
+    ) {
+        _log.LogDebug("Updating document with id {id} to {index}", operation.Id, indexName);
+
+        var response = await _elasticClient.UpdateAsync(
+            new UpdateRequest<object, object>(indexName, operation.Id) {
+                Doc = operation.Document
+            },
+            cancellationToken
+        );
+
+        return new ElasticCallResponse(response.IsValid, response.DebugInformation);
+    }
+
+    record ElasticCallResponse(bool IsValid, string DebugInformation);
 }
 
 public record ElasticJsonProjectOptions;
