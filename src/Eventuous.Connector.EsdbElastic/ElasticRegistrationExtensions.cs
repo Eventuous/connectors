@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nest;
 using static System.String;
 
-namespace Eventuous.Connector.EsdbElastic.Infrastructure;
+namespace Eventuous.Connector.EsdbElastic;
 
 static class ElasticRegistrationExtensions {
     public static IServiceCollection AddElasticClient(

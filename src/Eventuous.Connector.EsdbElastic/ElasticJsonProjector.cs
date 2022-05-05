@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using static Eventuous.Connector.EsdbElastic.ProjectionResult;
 
-namespace Eventuous.Connector.EsdbElastic.Infrastructure;
+namespace Eventuous.Connector.EsdbElastic;
 
 public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
     readonly IElasticClient                _elasticClient;
@@ -26,15 +26,21 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
         string    index     = stream;
         IndexName indexName = index;
 
+        // One-by-one, we'll index each message. In reality, the projector will always handle just a single message
         foreach (var message in messages) {
-            if (message.Message is not ProjectionResult projectionResult) {
-                continue;
+            await ProduceLocal(message);
+        }
+
+        async Task ProduceLocal(ProducedMessage message) {
+            if (message.Message is not ProjectionResult projectionResult
+             || projectionResult.OperationCase == OperationOneofCase.Ignore) {
+                return;
             }
 
             var resp = projectionResult.OperationCase switch {
                 OperationOneofCase.Index  => await Index(projectionResult.Index, indexName, cancellationToken),
                 OperationOneofCase.Update => await Update(projectionResult.Update, indexName, cancellationToken),
-                _ => new ElasticCallResponse(true, "")
+                _                         => new ElasticCallResponse(true, "", null)
             };
 
             if (!resp.IsValid) {
@@ -45,7 +51,10 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
                     resp.DebugInformation
                 );
 
-                throw new InvalidOperationException("Failed to execute call to Elasticsearch");
+                await message.Nack(resp.DebugInformation, resp.Exception);
+            }
+            else {
+                await message.Ack();
             }
         }
     }
@@ -62,7 +71,7 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
             cancellationToken
         );
 
-        return new ElasticCallResponse(response.IsValid, response.DebugInformation);
+        return new ElasticCallResponse(response.IsValid, response.DebugInformation, response.OriginalException);
     }
 
     async Task<ElasticCallResponse> Update(
@@ -79,10 +88,10 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
             cancellationToken
         );
 
-        return new ElasticCallResponse(response.IsValid, response.DebugInformation);
+        return new ElasticCallResponse(response.IsValid, response.DebugInformation, response.OriginalException);
     }
 
-    record ElasticCallResponse(bool IsValid, string DebugInformation);
+    record ElasticCallResponse(bool IsValid, string DebugInformation, Exception? Exception);
 }
 
 public record ElasticJsonProjectOptions;

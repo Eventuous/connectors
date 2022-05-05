@@ -1,13 +1,19 @@
 namespace Eventuous.Connector.Base.Config;
 
 public record ConnectorConfig<TSource, TTarget> where TSource : class where TTarget : class {
-    public ConnectorSettings Connector { get; init; } = new();
-    public TSource           Source    { get; init; } = null!;
-    public TTarget           Target    { get; init; } = null!;
+    public ConnectorSettings      Connector { get; init; } = new();
+    public GrpcProjectorSettings? Grpc      { get; init; }
+    public TSource                Source    { get; init; } = null!;
+    public TTarget                Target    { get; init; } = null!;
 }
 
 public record ConnectorConfig {
     public ConnectorSettings Connector { get; init; } = new();
+}
+
+public record GrpcProjectorSettings {
+    // TODO: Add credentials
+    public string Uri { get; init; } = "http://localhost:9200";
 }
 
 public record ConnectorSettings {

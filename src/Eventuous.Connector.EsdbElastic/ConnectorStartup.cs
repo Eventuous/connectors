@@ -7,7 +7,6 @@ using Eventuous.Connector.Base.Config;
 using Eventuous.Connector.Base.Diag;
 using Eventuous.Connector.Base.Grpc;
 using Eventuous.Connector.EsdbElastic.Conversions;
-using Eventuous.Connector.EsdbElastic.Infrastructure;
 using Eventuous.ElasticSearch.Index;
 using Eventuous.ElasticSearch.Producers;
 using Eventuous.ElasticSearch.Projections;
@@ -49,6 +48,7 @@ public class ConnectorStartup : IConnectorStartup {
                 cfg
                     .AddGrpcClientInstrumentation(options => options.Enrich          = enrich)
                     .AddElasticsearchClientInstrumentation(options => options.Enrich = enrich),
+            sampler: new AlwaysOnSampler(),
             tracingExporters: tracingExporters,
             metricsExporters: metricsExporters
         );
@@ -147,9 +147,10 @@ public class ConnectorStartup : IConnectorStartup {
                 b => {
                     b.UseCheckpointStore<ElasticCheckpointStore>();
                     b.WithPartitioningByStream(concurrencyLimit);
-
+                    
+                    var grpcUri = Ensure.NotEmptyString(config.Grpc?.Uri, "gRPC projector URI");
                     b.AddConsumeFilterLast(
-                        new GrpcProjectionFilter<Projection.ProjectionClient, ProjectionResult>("http://localhost:9091")
+                        new GrpcProjectionFilter<Projection.ProjectionClient, ProjectionResult>(grpcUri)
                     );
                 }
             );

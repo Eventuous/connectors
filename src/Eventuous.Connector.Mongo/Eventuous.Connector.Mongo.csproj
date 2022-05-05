@@ -1,5 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <IsPackable>true</IsPackable>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
+        <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
+        <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.0.0-rc9.2" />
+        <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
+    </ItemGroup>
 </Project>

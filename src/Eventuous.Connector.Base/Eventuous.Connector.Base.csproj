@@ -3,20 +3,25 @@
         <IsPackable>true</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Eventuous.AspNetCore" Version="$(EventuousVersion)" />
-        <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
-        <PackageReference Include="Eventuous.Gateway" Version="$(EventuousVersion)" />
-        <PackageReference Include="Serilog" Version="2.10.0" />
-        <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-        <PackageReference Include="NetEscapades.Configuration.Yaml" Version="2.2.0" />
-        <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
-        <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
+        <PackageReference Include="Eventuous.AspNetCore" Version="$(EventuousVersion)"/>
+        <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)"/>
+        <PackageReference Include="Eventuous.Gateway" Version="$(EventuousVersion)"/>
+        <PackageReference Include="Serilog" Version="2.10.0"/>
+        <PackageReference Include="Serilog.AspNetCore" Version="5.0.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1"/>
+        <PackageReference Include="NetEscapades.Configuration.Yaml" Version="2.2.0"/>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.40.0"/>
+        <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All"/>
     </ItemGroup>
     <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
     </ItemGroup>
     <ItemGroup>
-        <Protobuf Include="Grpc\Protos\project.proto" GrpcServices="Client" />
+        <Protobuf Include="Grpc\Protos\project.proto" GrpcServices="Client"/>
+    </ItemGroup>
+    <ItemGroup>
+        <!--        <ProjectReference Include="..\..\..\..\eventuous\src\Diagnostics\src\Eventuous.Diagnostics.OpenTelemetry\Eventuous.Diagnostics.OpenTelemetry.csproj" />-->
+        <!--        <ProjectReference Include="..\..\..\..\eventuous\src\Gateway\src\Eventuous.Gateway\Eventuous.Gateway.csproj" />-->
+        <!--        <ProjectReference Include="..\..\..\..\eventuous\src\Extensions\src\Eventuous.AspNetCore\Eventuous.AspNetCore.csproj" />-->
     </ItemGroup>
 </Project>

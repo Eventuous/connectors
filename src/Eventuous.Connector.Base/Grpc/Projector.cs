@@ -52,9 +52,9 @@ public sealed class Projector<TClient, TResponse> : IAsyncDisposable
         async Task HandleResponses() {
             Log.Information("[Grpc] Subscribing...");
 
-            await foreach (var response in
-                           _call.ResponseStream.ReadAllAsync(cancellationToken: linked.Token)) {
+            await foreach (var response in _call.ResponseStream.ReadAllAsync(cancellationToken: linked.Token)) {
                 // add retries
+                Log.Verbose("[Grpc] Received response: {response}", response);
                 await _handler(response, linked.Token);
             }
         }

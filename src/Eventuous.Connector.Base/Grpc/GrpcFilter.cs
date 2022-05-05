@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Text;
+using Eventuous.Diagnostics;
 using Eventuous.Subscriptions.Context;
 using Eventuous.Subscriptions.Filters;
 using Grpc.Core;
@@ -11,23 +13,35 @@ public sealed class GrpcProjectionFilter<TClient, TResult> : ConsumeFilter<Delay
     readonly Projector<TClient, TResult> _projector;
 
     public GrpcProjectionFilter(string host) {
-        _projector =
-            new Projector<TClient, TResult>(host, ChannelCredentials.Insecure, Handler);
-
+        _projector = new Projector<TClient, TResult>(host, ChannelCredentials.Insecure, Handler);
         _projector.Run(default);
     }
 
     async Task Handler(TResult result, CancellationToken cancellationToken) {
-        var messageContext = _contexts.Single(x => x.Context.MessageId == result.EventId);
-        _contexts.Remove(messageContext);
-        await messageContext.Next!(messageContext.Context.WithItem("projectionResult", result));
+        var ctx = _contexts.Single(x => x.Context.MessageId == result.EventId);
+
+        using var activity = Start();
+        _contexts.Remove(ctx);
+        await ctx.Next!(ctx.Context.WithItem("projectionResult", result));
+
+        Activity? Start()
+            => ctx.TraceId == null || ctx.SpanId == null ? null
+                : EventuousDiagnostics.ActivitySource.StartActivity(
+                    ActivityKind.Producer,
+                    new ActivityContext(
+                        ctx.TraceId.Value,
+                        ctx.SpanId.Value,
+                        ActivityTraceFlags.Recorded
+                    )
+                );
     }
 
     public override async ValueTask Send(
         DelayedAckConsumeContext                   context,
         Func<DelayedAckConsumeContext, ValueTask>? next
     ) {
-        _contexts.Add(new LocalContext(context, next));
+        var activity = context.Items.TryGetItem<Activity>("activity");
+        _contexts.Add(new LocalContext(context, next, activity?.Context.TraceId, activity?.Context.SpanId));
         var json = Encoding.UTF8.GetString((context.Message as byte[])!);
 
         await _projector.Project(
@@ -42,7 +56,12 @@ public sealed class GrpcProjectionFilter<TClient, TResult> : ConsumeFilter<Delay
 
     public ValueTask DisposeAsync() => _projector.DisposeAsync();
 
-    record LocalContext(DelayedAckConsumeContext Context, Func<DelayedAckConsumeContext, ValueTask>? Next);
+    record LocalContext(
+        DelayedAckConsumeContext                   Context,
+        Func<DelayedAckConsumeContext, ValueTask>? Next,
+        ActivityTraceId?                           TraceId,
+        ActivitySpanId?                            SpanId
+    );
 
     readonly List<LocalContext> _contexts = new();
 }

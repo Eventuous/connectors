@@ -12,6 +12,9 @@
         <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
     </ItemGroup>
     <ItemGroup>
+<!--        <ProjectReference Include="..\..\..\..\eventuous\src\EventStore\src\Eventuous.EventStore\Eventuous.EventStore.csproj" />-->
+<!--        <ProjectReference Include="..\..\..\..\eventuous\src\Experimental\src\Eventuous.ElasticSearch\Eventuous.ElasticSearch.csproj" />-->
+<!--        <ProjectReference Include="..\..\..\..\eventuous\src\Gateway\src\Eventuous.Gateway\Eventuous.Gateway.csproj" />-->
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
     </ItemGroup>
     <ItemGroup>

@@ -5,9 +5,9 @@ namespace Eventuous.Connector.Base.Grpc;
 
 public class GrpcTransform<TProduceOptions, TResult> : IGatewayTransform<TProduceOptions>
     where TProduceOptions : new() where TResult : IProjectionResult {
-    readonly string _indexName;
+    readonly string _target;
 
-    public GrpcTransform(string indexName) => _indexName = indexName;
+    public GrpcTransform(string target) => _target = target;
 
     static readonly TProduceOptions Options = new();
 
@@ -15,7 +15,7 @@ public class GrpcTransform<TProduceOptions, TResult> : IGatewayTransform<TProduc
         var projectionResult = context.Items.TryGetItem<TResult>("projectionResult");
 
         var gatewayMessage = new GatewayMessage<TProduceOptions>(
-            new StreamName(_indexName),
+            new StreamName(_target),
             projectionResult!,
             null,
             Options

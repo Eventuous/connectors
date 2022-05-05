@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package projection;
+option csharp_namespace = "Eventuous.Connector.SqlServer";
+
+import "Eventuous.Connector.Base/Grpc/Protos/project.proto";
+
+service Projection {
+  rpc Project (stream ProjectionContext) returns (stream ProjectionResult);
+}
+
+message Execute {
+  string sql = 1;
+}
+
+message ProjectionResult {
+  string eventId = 1;
+  oneof operation {
+    Ignore ignore = 2;
+    Execute execute = 3;
+  }
+}
