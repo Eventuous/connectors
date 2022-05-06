@@ -35,7 +35,7 @@ message Script {
 }
 
 message ProjectionResult {
-  string eventId = 1;
+  ResponseContext context = 1;
   oneof operation {
     Ignore ignore = 2;
     Index index = 3;

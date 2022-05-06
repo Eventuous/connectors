@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package projection;
-option csharp_namespace = "Eventuous.Connector.SqlServer";
+option csharp_namespace = "Eventuous.Connector.Mongo";
 
 import "Eventuous.Connector.Base/Grpc/Protos/project.proto";
 
@@ -9,14 +9,25 @@ service Projection {
   rpc Project (stream ProjectionContext) returns (stream ProjectionResult);
 }
 
-message Execute {
-  string sql = 1;
+message InsertOne {
+  string document = 1;
+}
+
+message UpdateOne {
+  string filter = 1;
+  string update = 2;
+}
+
+message DeleteOne {
+  string filter = 1;
 }
 
 message ProjectionResult {
   ResponseContext context = 1;
   oneof operation {
     Ignore ignore = 2;
-    Execute execute = 3;
+    InsertOne insertOne = 3;
+    UpdateOne updateOne = 4;
+    DeleteOne deleteOne = 5;
   }
 }

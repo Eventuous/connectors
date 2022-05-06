@@ -10,4 +10,8 @@ message ProjectionContext {
   string eventJson = 4;
 }
 
+message ResponseContext {
+  string eventId = 1;
+}
+
 message Ignore {}

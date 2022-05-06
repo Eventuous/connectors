@@ -4,8 +4,10 @@ using Eventuous.Connector.Base.Config;
 using Eventuous.Connector.Base.Diag;
 using Eventuous.Connector.Base.Grpc;
 using Eventuous.Connector.Base.Serialization;
-using Eventuous.Connector.SqlServer.Config;
+using Eventuous.Connector.EsdbElastic.Config;
+using Eventuous.Connector.Mongo.Config;
 using Eventuous.EventStore.Subscriptions;
+using Eventuous.Projections.MongoDB;
 using Eventuous.Subscriptions.Registrations;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Metrics;
@@ -13,7 +15,7 @@ using OpenTelemetry.Trace;
 
 // ReSharper disable ConvertToLocalFunction
 
-namespace Eventuous.Connector.SqlServer;
+namespace Eventuous.Connector.Mongo;
 
 [UsedImplicitly]
 public class ConnectorStartup : IConnectorStartup {
@@ -23,7 +25,7 @@ public class ConnectorStartup : IConnectorStartup {
         ExporterMappings<MeterProviderBuilder>  metricsExporters
     ) {
         var builder = ConnectorApp
-            .Create<EsdbConfig, SqlConfig>(configFile);
+            .Create<EsdbConfig, MongoConfig>(configFile);
 
         builder
             .RegisterDependencies(RegisterProject)
@@ -33,7 +35,7 @@ public class ConnectorStartup : IConnectorStartup {
             (cfg, enrich) =>
                 cfg
                     .AddGrpcClientInstrumentation(options => options.Enrich = enrich)
-                    .AddSqlClientInstrumentation(options => options.Enrich  = enrich),
+                    .AddMongoDBInstrumentation(),
             sampler: new AlwaysOnSampler(),
             tracingExporters: tracingExporters,
             metricsExporters: metricsExporters
@@ -42,26 +44,27 @@ public class ConnectorStartup : IConnectorStartup {
         return builder.Build();
     }
 
-    static void RegisterProject(IServiceCollection services, ConnectorConfig<EsdbConfig, SqlConfig> config)
+    static void RegisterProject(IServiceCollection services, ConnectorConfig<EsdbConfig, MongoConfig> config)
         => services
             .AddEventStoreClient(
                 Ensure.NotEmptyString(config.Source.ConnectionString, "EventStoreDB connection string")
             )
-            .AddSingleton(
-                ConnectionFactory.GetConnectionFactory(
-                    Ensure.NotEmptyString(config.Target.ConnectionString, "SQL connection string")
-                )
+            .AddMongo(
+                Ensure.NotEmptyString(config.Target.ConnectionString, "MongoDB connection string"),
+                Ensure.NotEmptyString(config.Target.Database, "MongoDB database")
             );
 
     static ConnectorBuilder<
             AllStreamSubscription, AllStreamSubscriptionOptions,
-            SqlProjector, SqlServerProjectOptions>
-        ConfigureProjectConnector(ConnectorBuilder cfg, ConnectorConfig<EsdbConfig, SqlConfig> config) {
+            MongoJsonProjector, MongoJsonProjectOptions>
+        ConfigureProjectConnector(ConnectorBuilder cfg, ConnectorConfig<EsdbConfig, MongoConfig> config) {
         var serializer       = new RawDataDeserializer();
         var concurrencyLimit = config.Source.ConcurrencyLimit;
 
         var getTransform =
-            (IServiceProvider _) => new GrpcTransform<SqlServerProjectOptions, ProjectionResult>("dummy");
+            (IServiceProvider _) => new GrpcTransform<MongoJsonProjectOptions, ProjectionResult>(
+                Ensure.NotEmptyString(config.Target.Collection, "MongoDB collection")
+            );
 
         var builder = cfg.SubscribeWith<AllStreamSubscription, AllStreamSubscriptionOptions>(
                 Ensure.NotEmptyString(config.Connector.ConnectorId)
@@ -74,10 +77,11 @@ public class ConnectorStartup : IConnectorStartup {
             )
             .ConfigureSubscription(
                 b => {
-                    b.UseCheckpointStore<SqlCheckpointStore>();
+                    b.UseCheckpointStore<MongoCheckpointStore>();
                     b.WithPartitioningByStream(concurrencyLimit);
 
                     var grpcUri = Ensure.NotEmptyString(config.Grpc?.Uri, "gRPC projector URI");
+
                     b.AddConsumeFilterLast(
                         new GrpcProjectionFilter<Projection.ProjectionClient, ProjectionResult>(grpcUri)
                     );
@@ -85,7 +89,7 @@ public class ConnectorStartup : IConnectorStartup {
             );
 
         return builder
-            .ProduceWith<SqlProjector, SqlServerProjectOptions>()
+            .ProduceWith<MongoJsonProjector, MongoJsonProjectOptions>()
             .TransformWith(getTransform);
     }
 }

@@ -6,6 +6,7 @@ using Eventuous.Connector.Base.App;
 using Eventuous.Connector.Base.Config;
 using Eventuous.Connector.Base.Diag;
 using Eventuous.Connector.Base.Grpc;
+using Eventuous.Connector.Base.Serialization;
 using Eventuous.Connector.EsdbElastic.Conversions;
 using Eventuous.ElasticSearch.Index;
 using Eventuous.ElasticSearch.Producers;
@@ -160,3 +161,4 @@ public class ConnectorStartup : IConnectorStartup {
             .TransformWith(getTransform);
     }
 }
+

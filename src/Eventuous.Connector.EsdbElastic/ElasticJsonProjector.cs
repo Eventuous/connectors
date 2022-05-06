@@ -71,7 +71,7 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
         IndexName         indexName,
         CancellationToken cancellationToken
     ) {
-        _log.LogDebug("Indexing document with id {id} to {index}", operation.Id, indexName);
+        _log.LogTrace("Indexing document with id {id} to {index}", operation.Id, indexName);
 
         var response = await _elasticClient.IndexAsync(
             new IndexRequest<object>(operation.Document, indexName, operation.Id),
@@ -86,7 +86,7 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
         IndexName         indexName,
         CancellationToken cancellationToken
     ) {
-        _log.LogDebug("Updating document with id {id} to {index}", operation.Id, indexName);
+        _log.LogTrace("Updating document with id {id} to {index}", operation.Id, indexName);
 
         var response = await _elasticClient.UpdateAsync(
             new UpdateRequest<object, object>(indexName, operation.Id) {

@@ -1,9 +1,9 @@
 using System.Reflection;
 using Eventuous.AspNetCore;
+using Eventuous.Connector.Base;
 using Eventuous.Connector.Base.App;
 using Eventuous.Connector.Base.Config;
 using Eventuous.Connector.Base.Diag;
-using Eventuous.Connector.EsdbElastic;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -56,18 +56,17 @@ public class StartupBuilder {
             ? _config.Connector.ConnectorAssembly
             : _config.Connector.ConnectorAssembly + ".dll";
 
-        // _log.Information("Loading connector assembly {assemblyFileName}", assemblyFileName);
-        //
-        // var assembly = Assembly.LoadFrom(Path.Join(path, assemblyFileName));
-        // var startup  = assembly.GetTypes().FirstOrDefault(x => x.IsAssignableTo(typeof(IConnectorStartup)));
-        //
-        // if (startup == null) {
-        //     _log.Fatal("Connector assembly must have an implementation of IConnectorStartup");
-        //     throw new ApplicationException();
-        // }
-        //
-        // var startupInstance = Activator.CreateInstance(startup) as IConnectorStartup;
-        var startupInstance = new ConnectorStartup();
+        _log.Information("Loading connector assembly {assemblyFileName}", assemblyFileName);
+        
+        var assembly = Assembly.LoadFrom(Path.Join(path, assemblyFileName));
+        var startup  = assembly.GetTypes().FirstOrDefault(x => x.IsAssignableTo(typeof(IConnectorStartup)));
+        
+        if (startup == null) {
+            _log.Fatal("Connector assembly must have an implementation of IConnectorStartup");
+            throw new ApplicationException();
+        }
+        
+        var startupInstance = Activator.CreateInstance(startup) as IConnectorStartup;
 
         _log.Information("Building connector application");
 

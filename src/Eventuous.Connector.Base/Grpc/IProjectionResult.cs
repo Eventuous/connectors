@@ -1,5 +1,5 @@
 namespace Eventuous.Connector.Base.Grpc; 
 
 public interface IProjectionResult {
-    string EventId { get; }
+    ResponseContext Context { get; }
 }

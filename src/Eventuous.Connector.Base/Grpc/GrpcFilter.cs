@@ -18,7 +18,7 @@ public sealed class GrpcProjectionFilter<TClient, TResult> : ConsumeFilter<Delay
     }
 
     async Task Handler(TResult result, CancellationToken cancellationToken) {
-        var ctx = _contexts.Single(x => x.Context.MessageId == result.EventId);
+        var ctx = _contexts.Single(x => x.Context.MessageId == result.Context.EventId);
 
         using var activity = Start();
         _contexts.Remove(ctx);

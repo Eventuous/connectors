@@ -39,14 +39,14 @@ public class SqlProjector : BaseProducer<SqlServerProjectOptions> {
             }
 
             try {
-                _log.LogTrace("Executing SQL {sql}", projectionResult.Execute.Sql);
+                _log.LogDebug("Executing SQL {sql}", projectionResult.Execute.Sql);
                 await _getConnection.ExecuteNonQuery(projectionResult.Execute.Sql, _ => { }, cancellationToken);
                 await message.Ack<SqlProjector>();
             }
             catch (Exception e) {
                 _log.LogError(
                     "Failed to project event {id} because {reason}",
-                    projectionResult.EventId,
+                    projectionResult.Context.EventId,
                     e.Message
                 );
 

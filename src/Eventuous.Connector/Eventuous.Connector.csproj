@@ -4,28 +4,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.2.0-rc5" />
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.2.0-rc5" />
-        <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="1.2.0-rc5" />
-        <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.2.0-rc5" />
+        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OtelVersion)" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OtelVersion)" />
+        <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="$(OtelVersion)" />
+        <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="$(OtelVersion)" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj" />
-        <!-- <ProjectReference Include="..\..\..\..\eventuous\src\Extensions\src\Eventuous.AspNetCore\Eventuous.AspNetCore.csproj" />-->
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
-        <!-- <ProjectReference Include="..\Eventuous.Connector.SqlServer\Eventuous.Connector.SqlServer.csproj" />-->
+<!--        <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj" />-->
+        <ProjectReference Include="..\Eventuous.Connector.Mongo\Eventuous.Connector.Mongo.csproj" />
+        <!--        <ProjectReference Include="..\Eventuous.Connector.SqlServer\Eventuous.Connector.SqlServer.csproj" />-->
     </ItemGroup>
 
-    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-        <None Update="config-sqlserver.yaml">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="config-elastc.yaml">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="config.yaml">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
+    <ItemGroup Condition="$(Configuration) == 'Debug'">
+      <None Update="config.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 </Project>

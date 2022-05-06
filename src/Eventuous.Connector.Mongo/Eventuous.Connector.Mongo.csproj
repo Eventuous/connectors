@@ -1,12 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <IsPackable>false</IsPackable>
+        <IsPackable>true</IsPackable>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
+        <PackageReference Include="Eventuous.Projections.MongoDB" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.0.0-rc9.2" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="$(OtelExtensionsVersion)" />
+        <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="1.0.0" />
         <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
+    </ItemGroup>
+    <ItemGroup>
+        <Protobuf Include="Grpc\Protos\client.proto" GrpcServices="Client" AdditionalImportDirs=".; .." />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
     </ItemGroup>
 </Project>
