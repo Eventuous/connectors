@@ -1,6 +1,6 @@
 connector:
-  connectorId: "esdb-sql-connector"
-  connectorAssembly: "Eventuous.Connector.SqlServer"
+  connectorId: "esdb-elastic-connector"
+  connectorAssembly: "Eventuous.Connector.EsdbElastic"
   diagnostics:
     tracing:
       enabled: true
@@ -13,6 +13,27 @@ source:
   connectionString: "esdb://localhost:2113?tls=false"
   concurrencyLimit: 1
 target:
-  connectionString: "Server=localhost;Database=test;User=sa;Password=Your_password123;Encrypt=True;TrustServerCertificate=True"
-grpc:
-  uri: "http://localhost:9091"
+  connectionString: "http://localhost:9200"
+  connectorMode: "produce"
+  dataStream:
+    indexName: "eventlog"
+    template:
+      templateName: "eventlog-template"
+    lifecycle:
+      policyName: "eventlog-policy"
+      tiers:
+        - tier: "hot"
+          minAge: "1d"
+          priority: 100
+          rollover:
+            maxAge: "1d"
+            maxSize: "100mb"
+        - tier: "warm"
+          minAge: "1d"
+          priority: 50
+          forceMerge:
+            maxNumSegments: 1
+        - tier: "cold"
+          minAge: "1d"
+          priority: 0
+          readOnly: true

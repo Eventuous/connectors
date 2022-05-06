@@ -3,7 +3,7 @@ using Eventuous.AspNetCore;
 using Eventuous.Connector.Base.App;
 using Eventuous.Connector.Base.Config;
 using Eventuous.Connector.Base.Diag;
-using Eventuous.Connector.SqlServer;
+using Eventuous.Connector.EsdbElastic;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;

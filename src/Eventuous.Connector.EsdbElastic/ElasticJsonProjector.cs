@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Eventuous.Producers;
+using Eventuous.Producers.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Nest;
 using static Eventuous.Connector.EsdbElastic.ProjectionResult;
@@ -10,11 +11,17 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
     readonly IElasticClient                _elasticClient;
     readonly ILogger<ElasticJsonProjector> _log;
 
-    public ElasticJsonProjector(IElasticClient elasticClient, ILogger<ElasticJsonProjector> logger) {
+    public ElasticJsonProjector(IElasticClient elasticClient, ILogger<ElasticJsonProjector> logger) 
+        : base(false, TracingOptions) {
         _elasticClient = elasticClient;
         _log           = logger;
-        ReadyNow();
     }
+    
+    static readonly ProducerTracingOptions TracingOptions = new() {
+        MessagingSystem  = "elasticsearch",
+        DestinationKind  = "index",
+        ProduceOperation = "project"
+    };
 
     [SuppressMessage("Usage", "CA2208:Instantiate argument exceptions correctly")]
     protected override async Task ProduceMessages(
@@ -51,10 +58,10 @@ public class ElasticJsonProjector : BaseProducer<ElasticJsonProjectOptions> {
                     resp.DebugInformation
                 );
 
-                await message.Nack(resp.DebugInformation, resp.Exception);
+                await message.Nack<ElasticJsonProjector>(resp.DebugInformation, resp.Exception);
             }
             else {
-                await message.Ack();
+                await message.Ack<ElasticJsonProjector>();
             }
         }
     }

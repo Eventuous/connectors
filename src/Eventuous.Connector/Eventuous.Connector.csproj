@@ -11,18 +11,21 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!--      <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj" />-->
-<!--        <ProjectReference Include="..\..\..\..\eventuous\src\Extensions\src\Eventuous.AspNetCore\Eventuous.AspNetCore.csproj" />-->
+        <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj" />
+        <!-- <ProjectReference Include="..\..\..\..\eventuous\src\Extensions\src\Eventuous.AspNetCore\Eventuous.AspNetCore.csproj" />-->
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
-        <ProjectReference Include="..\Eventuous.Connector.SqlServer\Eventuous.Connector.SqlServer.csproj" />
+        <!-- <ProjectReference Include="..\Eventuous.Connector.SqlServer\Eventuous.Connector.SqlServer.csproj" />-->
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-        <None Update="config.yaml">
+        <None Update="config-sqlserver.yaml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="config-elastc.yaml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="config.yaml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 </Project>

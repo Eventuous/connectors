@@ -1,4 +1,5 @@
 using Eventuous.Producers;
+using Eventuous.Producers.Diagnostics;
 using Microsoft.Extensions.Logging;
 using static Eventuous.Connector.SqlServer.ProjectionResult;
 
@@ -8,11 +9,17 @@ public class SqlProjector : BaseProducer<SqlServerProjectOptions> {
     readonly GetConnection                    _getConnection;
     readonly ILogger<SqlServerProjectOptions> _log;
 
-    public SqlProjector(GetConnection getConnection, ILogger<SqlServerProjectOptions> logger) {
+    public SqlProjector(GetConnection getConnection, ILogger<SqlServerProjectOptions> logger)
+        : base(false, TracingOptions) {
         _getConnection = getConnection;
         _log           = logger;
-        ReadyNow();
     }
+
+    static readonly ProducerTracingOptions TracingOptions = new() {
+        MessagingSystem  = "sqlserver",
+        DestinationKind  = "table",
+        ProduceOperation = "project"
+    };
 
     protected override async Task ProduceMessages(
         StreamName                   stream,
@@ -34,6 +41,7 @@ public class SqlProjector : BaseProducer<SqlServerProjectOptions> {
             try {
                 _log.LogTrace("Executing SQL {sql}", projectionResult.Execute.Sql);
                 await _getConnection.ExecuteNonQuery(projectionResult.Execute.Sql, _ => { }, cancellationToken);
+                await message.Ack<SqlProjector>();
             }
             catch (Exception e) {
                 _log.LogError(
@@ -42,7 +50,7 @@ public class SqlProjector : BaseProducer<SqlServerProjectOptions> {
                     e.Message
                 );
 
-                await message.Nack("Failed to project event", e);
+                await message.Nack<SqlProjector>("Failed to project event", e);
             }
         }
     }

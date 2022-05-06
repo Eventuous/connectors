@@ -35,7 +35,7 @@ static class ElasticRegistrationExtensions {
             ? (def, _) => getSerializer(def)
             : null;
 
-        var settings = new ConnectionSettings(pool, serializerFactory);
+        var settings = new ConnectionSettings(pool, serializerFactory); //.DisableDirectStreaming(); <-- use for debug
 
         if (configureSettings is not null) settings = configureSettings(settings);
 

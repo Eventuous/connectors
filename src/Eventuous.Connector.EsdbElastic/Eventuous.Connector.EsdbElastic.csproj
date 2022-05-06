@@ -3,10 +3,12 @@
         <IsPackable>true</IsPackable>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Elasticsearch.Net" Version="7.17.1" />
         <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.ElasticSearch" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
+        <PackageReference Include="NEST" Version="7.17.1" />
         <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.ElasticsearchClient" Version="1.0.0-beta2" />
         <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.0.0-rc9.2" />
         <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
