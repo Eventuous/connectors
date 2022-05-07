@@ -1,4 +1,4 @@
-namespace Eventuous.Connector.Mongo.Config;
+namespace Eventuous.Connector.EsdbMongo.Config;
 
 public record MongoConfig {
     public string? ConnectionString { get; init; }

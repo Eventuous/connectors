@@ -1,7 +1,7 @@
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
 
-namespace Eventuous.Connector.SqlServer;
+namespace Eventuous.Connector.EsdbSqlServer;
 
 public delegate Task<DbConnection> GetConnection(CancellationToken cancellationToken);
 

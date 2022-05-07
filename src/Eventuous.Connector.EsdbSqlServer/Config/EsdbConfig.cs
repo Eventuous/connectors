@@ -1,4 +1,4 @@
-namespace Eventuous.Connector.EsdbElastic.Config; 
+namespace Eventuous.Connector.EsdbSqlServer.Config; 
 
 public record EsdbConfig {
     public string ConnectionString { get; init; } = null!;

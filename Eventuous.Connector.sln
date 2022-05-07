@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.Base", "src\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj", "{81246B91-33BA-4CB6-97D7-44D299E5C6C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.Mongo", "src\Eventuous.Connector.Mongo\Eventuous.Connector.Mongo.csproj", "{EC5BB4ED-F56C-45E7-A634-EF014C157528}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.EsdbMongo", "src\Eventuous.Connector.EsdbMongo\Eventuous.Connector.EsdbMongo.csproj", "{EC5BB4ED-F56C-45E7-A634-EF014C157528}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "temp", "temp", "{12B5FFCE-36A8-4D72-9BA9-C3BA221202D8}"
 EndProject
@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Gateway", "..\..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Diagnostics.OpenTelemetry", "..\..\eventuous\src\Diagnostics\src\Eventuous.Diagnostics.OpenTelemetry\Eventuous.Diagnostics.OpenTelemetry.csproj", "{FDA93C65-368B-4E46-A974-D4273F8370DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.SqlServer", "src\Eventuous.Connector.SqlServer\Eventuous.Connector.SqlServer.csproj", "{815B38ED-F0E8-4253-8085-B072790AF15B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Connector.EsdbSqlServer", "src\Eventuous.Connector.EsdbSqlServer\Eventuous.Connector.EsdbSqlServer.csproj", "{815B38ED-F0E8-4253-8085-B072790AF15B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Subscriptions", "..\..\eventuous\src\Core\src\Eventuous.Subscriptions\Eventuous.Subscriptions.csproj", "{5CC0DAD2-779E-4E96-B203-AB14CA91E8AF}"
 EndProject

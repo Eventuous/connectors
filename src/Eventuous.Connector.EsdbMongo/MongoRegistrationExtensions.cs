@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 
-namespace Eventuous.Connector.Mongo;
+namespace Eventuous.Connector.EsdbMongo;
 
 public static class MongoRegistrationExtensions {
     public static IServiceCollection AddMongo(

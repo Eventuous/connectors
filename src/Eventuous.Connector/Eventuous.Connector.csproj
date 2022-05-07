@@ -13,7 +13,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
 <!--        <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj" />-->
-        <ProjectReference Include="..\Eventuous.Connector.Mongo\Eventuous.Connector.Mongo.csproj" />
+        <ProjectReference Include="..\Eventuous.Connector.EsdbMongo\Eventuous.Connector.EsdbMongo.csproj" />
         <!--        <ProjectReference Include="..\Eventuous.Connector.SqlServer\Eventuous.Connector.SqlServer.csproj" />-->
     </ItemGroup>
 

@@ -3,7 +3,7 @@ using System.Data.Common;
 using Eventuous.Subscriptions.Checkpoints;
 using Microsoft.Extensions.Logging;
 
-namespace Eventuous.Connector.SqlServer;
+namespace Eventuous.Connector.EsdbSqlServer;
 
 public class SqlCheckpointStore : ICheckpointStore {
     readonly GetConnection               _getConnection;

@@ -1,9 +1,9 @@
 using Eventuous.Producers;
 using Eventuous.Producers.Diagnostics;
 using Microsoft.Extensions.Logging;
-using static Eventuous.Connector.SqlServer.ProjectionResult;
+using static Eventuous.Connector.EsdbSqlServer.ProjectionResult;
 
-namespace Eventuous.Connector.SqlServer;
+namespace Eventuous.Connector.EsdbSqlServer;
 
 public class SqlProjector : BaseProducer<SqlServerProjectOptions> {
     readonly GetConnection                    _getConnection;

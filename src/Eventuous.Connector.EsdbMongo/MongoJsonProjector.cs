@@ -4,9 +4,9 @@ using Eventuous.Producers.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using static Eventuous.Connector.Mongo.ProjectionResult;
+using static Eventuous.Connector.EsdbMongo.ProjectionResult;
 
-namespace Eventuous.Connector.Mongo;
+namespace Eventuous.Connector.EsdbMongo;
 
 public class MongoJsonProjector : BaseProducer<MongoJsonProjectOptions> {
     readonly IMongoDatabase              _database;

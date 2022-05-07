@@ -1,4 +1,4 @@
-namespace Eventuous.Connector.SqlServer.Config; 
+namespace Eventuous.Connector.EsdbMongo.Config; 
 
 public record EsdbConfig {
     public string ConnectionString { get; init; } = null!;
