@@ -1,6 +1,6 @@
 connector:
   connectorId: "esdb-sql-connector"
-  connectorAssembly: "Eventuous.Connector.SqlServer"
+  connectorAssembly: "Eventuous.Connector.EsdbSqlServer"
   diagnostics:
     tracing:
       enabled: true

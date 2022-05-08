@@ -75,31 +75,6 @@ services:
     networks:
       - elastic
   
-  es04:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
-    container_name: es04
-    environment:
-      - node.name=es04
-      - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es01,es02,es03
-      - cluster.initial_master_nodes=es01,es02,es03,es04
-      - node.roles=master,data_frozen
-      - path.repo=/usr/share/elasticsearch/snapshots
-      - xpack.searchable.snapshot.shared_cache.size=10%
-      - xpack.security.enabled=false
-      #- bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    mem_limit: 1Gb
-    volumes:
-      - frozen_data:/usr/share/elasticsearch/data
-      - snapshots:/usr/share/elasticsearch/snapshots
-    networks:
-      - elastic
-  
   kib01:
     image: docker.elastic.co/kibana/kibana:7.15.0
     container_name: kib01
@@ -111,54 +86,6 @@ services:
     mem_limit: 1Gb
     networks:
       - elastic
-  
-  esdb:
-    container_name: eventuous-elastic-esdb
-    image: ghcr.io/eventstore/eventstore:21.10.0-alpha-arm64v8
-    ports:
-      - '2113:2113'
-      - '1113:1113'
-    environment:
-      EVENTSTORE_INSECURE: 'true'
-      EVENTSTORE_CLUSTER_SIZE: 1
-      EVENTSTORE_EXT_TCP_PORT: 1113
-      EVENTSTORE_HTTP_PORT: 2113
-      EVENTSTORE_ENABLE_EXTERNAL_TCP: 'true'
-      EVENTSTORE_RUN_PROJECTIONS: all
-      EVENTSTORE_START_STANDARD_PROJECTIONS: "true"
-      EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP: "true"
-    networks:
-      - elastic
-
-  zipkin:
-    image: openzipkin/zipkin
-    container_name: zipkin
-    ports:
-      - "9411:9411"
-    networks:
-      - elastic
-
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus:latest
-    volumes:
-      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - elastic
-
-  connector:
-    image: eventuous/connector:main
-    volumes:
-      - ./config.yaml:/app/config.yaml
-    ports:
-      - "5001:5000"
-    depends_on:
-      - es01
-      - esdb
-    networks:
-      - elastic
 
 volumes:
   hot_data:
@@ -166,8 +93,6 @@ volumes:
   warm_data:
     driver: local
   cold_data:
-    driver: local
-  frozen_data:
     driver: local
   snapshots:
     driver: local

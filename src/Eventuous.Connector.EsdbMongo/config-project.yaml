@@ -1,6 +1,6 @@
 connector:
   connectorId: "esdb-mongo-connector"
-  connectorAssembly: "Eventuous.Connector.Mongo"
+  connectorAssembly: "Eventuous.Connector.EsdbMongo"
   diagnostics:
     tracing:
       enabled: true
