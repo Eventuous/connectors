@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package projection;
+option csharp_namespace = "Eventuous.Connector";
+
+message ProjectionContext {
+  string eventType = 1;
+  string eventId = 2;
+  string stream = 3;
+  string eventJson = 4;
+}
+
+message ResponseContext {
+  string eventId = 1;
+}
+
+message Ignore {}

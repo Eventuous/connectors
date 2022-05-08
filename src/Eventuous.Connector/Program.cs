@@ -1,5 +1,4 @@
 using Eventuous.Connector;
-using Eventuous.Connector.Base;
 using Eventuous.Connector.Base.Diag;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;

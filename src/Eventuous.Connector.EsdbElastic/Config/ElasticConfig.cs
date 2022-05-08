@@ -7,4 +7,5 @@ public record ElasticConfig {
     public string?      CloudId          { get; init; }
     public string?      ApiKey           { get; init; }
     public IndexConfig? DataStream       { get; init; }
+    public string       ConnectorMode    { get; init; } = "produce";
 }

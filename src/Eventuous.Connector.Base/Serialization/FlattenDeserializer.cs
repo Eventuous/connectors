@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Eventuous.Connector.Base;
+namespace Eventuous.Connector.Base.Serialization;
 
 public static class FlattenDeserializer {
     public static IDictionary<string, object> Deserialize(string json)

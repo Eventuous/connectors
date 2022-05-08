@@ -1,4 +1,5 @@
 using System.Reflection;
+using Eventuous.AspNetCore;
 using Eventuous.Connector.Base;
 using Eventuous.Connector.Base.App;
 using Eventuous.Connector.Base.Config;
@@ -56,15 +57,15 @@ public class StartupBuilder {
             : _config.Connector.ConnectorAssembly + ".dll";
 
         _log.Information("Loading connector assembly {assemblyFileName}", assemblyFileName);
-
+        
         var assembly = Assembly.LoadFrom(Path.Join(path, assemblyFileName));
         var startup  = assembly.GetTypes().FirstOrDefault(x => x.IsAssignableTo(typeof(IConnectorStartup)));
-
+        
         if (startup == null) {
             _log.Fatal("Connector assembly must have an implementation of IConnectorStartup");
             throw new ApplicationException();
         }
-
+        
         var startupInstance = Activator.CreateInstance(startup) as IConnectorStartup;
 
         _log.Information("Building connector application");
@@ -90,6 +91,8 @@ public class StartupBuilder {
             _log.Information("Adding Prometheus metrics exporter");
             _app.Host.UseOpenTelemetryPrometheusScrapingEndpoint();
         }
+
+        _app.Host.AddEventuousLogs();
 
         _log.Information("Starting connector application");
         return _app.Run();

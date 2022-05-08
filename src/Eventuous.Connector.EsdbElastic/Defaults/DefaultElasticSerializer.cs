@@ -15,17 +15,13 @@ public class DefaultElasticSerializer : IElasticsearchSerializer {
 
     public T Deserialize<T>(Stream stream) => _builtIn.Deserialize<T>(stream);
 
-    public Task<object> DeserializeAsync(
-        Type type, Stream stream, CancellationToken cancellationToken = default
-    )
+    public Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default)
         => _builtIn.DeserializeAsync(type, stream, cancellationToken);
 
     public Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         => _builtIn.DeserializeAsync<T>(stream, cancellationToken);
 
-    public void Serialize<T>(
-        T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None
-    ) {
+    public void Serialize<T>(T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None) {
         if (data is not PersistedEvent persistedEvent) {
             _builtIn.Serialize(data, stream, formatting);
             return;
@@ -33,14 +29,15 @@ public class DefaultElasticSerializer : IElasticsearchSerializer {
 
         var payload = persistedEvent.Message as byte[];
 
-        using var doc = JsonSerializer.SerializeToDocument(persistedEvent with { Message = null }, Options);
+        using var doc    = JsonSerializer.SerializeToDocument(persistedEvent with { Message = null }, Options);
         using var writer = new Utf8JsonWriter(stream);
         writer.WriteStartObject();
 
         foreach (var jsonElement in doc.RootElement.EnumerateObject()) {
             if (jsonElement.NameEquals("message")) {
                 writer.WritePropertyName("event");
-                writer.WriteRawValue(payload);
+                var parsed = JsonDocument.Parse(payload);
+                parsed.WriteTo(writer);
             }
             else if (jsonElement.NameEquals("created")) {
                 writer.WriteString("@timestamp", persistedEvent.Created);
