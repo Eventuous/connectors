@@ -131,9 +131,10 @@ public class ConnectorStartup : IConnectorStartup {
         var serializer       = new RawDataDeserializer();
         var concurrencyLimit = config.Source.ConcurrencyLimit;
 
-        var indexName    = Ensure.NotEmptyString(config.Target.DataStream?.IndexName);
-        var getTransform = 
-            (IServiceProvider _) => new GrpcTransform<ElasticJsonProjectOptions, ProjectionResult>(indexName);
+        var indexName = Ensure.NotEmptyString(config.Target.DataStream?.IndexName);
+
+        var getTransform =
+            (IServiceProvider _) => new GrpcTransform<ElasticJsonProjectOptions>(indexName);
 
         var builder = cfg.SubscribeWith<AllStreamSubscription, AllStreamSubscriptionOptions>(
                 Ensure.NotEmptyString(config.Connector.ConnectorId)
@@ -148,11 +149,9 @@ public class ConnectorStartup : IConnectorStartup {
                 b => {
                     b.UseCheckpointStore<ElasticCheckpointStore>();
                     b.WithPartitioningByStream(concurrencyLimit);
-                    
+
                     var grpcUri = Ensure.NotEmptyString(config.Grpc?.Uri, "gRPC projector URI");
-                    b.AddConsumeFilterLast(
-                        new GrpcProjectionFilter<Projection.ProjectionClient, ProjectionResult>(grpcUri)
-                    );
+                    b.AddConsumeFilterLast(new GrpcProjectionFilter(grpcUri));
                 }
             );
 
@@ -161,4 +160,3 @@ public class ConnectorStartup : IConnectorStartup {
             .TransformWith(getTransform);
     }
 }
-

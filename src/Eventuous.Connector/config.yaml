@@ -14,26 +14,8 @@ source:
   concurrencyLimit: 1
 target:
   connectionString: "http://localhost:9200"
-  connectorMode: "produce"
+  connectorMode: "project"
   dataStream:
-    indexName: "eventlog"
-    template:
-      templateName: "eventlog-template"
-    lifecycle:
-      policyName: "eventlog-policy"
-      tiers:
-        - tier: "hot"
-          minAge: "1d"
-          priority: 100
-          rollover:
-            maxAge: "1d"
-            maxSize: "100mb"
-        - tier: "warm"
-          minAge: "1d"
-          priority: 50
-          forceMerge:
-            maxNumSegments: 1
-        - tier: "cold"
-          minAge: "1d"
-          priority: 0
-          readOnly: true
+    indexName: "test"
+grpc:
+  uri: "http://localhost:9091"

@@ -61,7 +61,7 @@ public class ConnectorStartup : IConnectorStartup {
         var concurrencyLimit = config.Source.ConcurrencyLimit;
 
         var getTransform =
-            (IServiceProvider _) => new GrpcTransform<SqlServerProjectOptions, ProjectionResult>("dummy");
+            (IServiceProvider _) => new GrpcTransform<SqlServerProjectOptions>("dummy");
 
         var builder = cfg.SubscribeWith<AllStreamSubscription, AllStreamSubscriptionOptions>(
                 Ensure.NotEmptyString(config.Connector.ConnectorId)
@@ -79,7 +79,7 @@ public class ConnectorStartup : IConnectorStartup {
 
                     var grpcUri = Ensure.NotEmptyString(config.Grpc?.Uri, "gRPC projector URI");
                     b.AddConsumeFilterLast(
-                        new GrpcProjectionFilter<Projection.ProjectionClient, ProjectionResult>(grpcUri)
+                        new GrpcProjectionFilter(grpcUri)
                     );
                 }
             );
