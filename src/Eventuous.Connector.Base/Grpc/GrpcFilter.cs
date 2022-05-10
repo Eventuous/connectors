@@ -11,8 +11,8 @@ namespace Eventuous.Connector.Base.Grpc;
 public sealed class GrpcProjectionFilter : ConsumeFilter<DelayedAckConsumeContext>, IAsyncDisposable {
     readonly Projector _projector;
 
-    public GrpcProjectionFilter(string host) {
-        _projector = new Projector(host, ChannelCredentials.Insecure, Handler);
+    public GrpcProjectionFilter(string host, ChannelCredentials credentials) {
+        _projector = new Projector(host, credentials, Handler);
         _projector.Run(default);
     }
 

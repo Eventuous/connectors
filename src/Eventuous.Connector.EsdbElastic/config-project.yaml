@@ -19,3 +19,4 @@ target:
     indexName: "test"
 grpc:
   uri: "http://localhost:9091"
+  credentials: "insecure"

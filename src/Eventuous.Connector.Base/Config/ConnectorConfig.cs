@@ -13,7 +13,8 @@ public record ConnectorConfig {
 
 public record GrpcProjectorSettings {
     // TODO: Add credentials
-    public string Uri { get; init; } = "http://localhost:9200";
+    public string Uri         { get; init; } = "http://localhost:9200";
+    public string Credentials { get; init; } = "ssl";
 }
 
 public record ConnectorSettings {

@@ -26,7 +26,7 @@ public sealed class Projector : IAsyncDisposable{
 
     AsyncDuplexStreamingCall<ProjectionRequest, ProjectionResponse>? _call;
 
-    public Projector(string host, ChannelCredentials? credentials, Func<ProjectionResponse, CancellationToken, Task> handler) {
+    public Projector(string host, ChannelCredentials credentials, Func<ProjectionResponse, CancellationToken, Task> handler) {
         _handler = handler;
 
         var channel = GrpcChannel.ForAddress(

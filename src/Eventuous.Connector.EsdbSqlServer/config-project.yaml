@@ -16,3 +16,4 @@ target:
   connectionString: "Server=localhost;Database=test;User=sa;Password=Your_password123;Encrypt=True;TrustServerCertificate=True"
 grpc:
   uri: "http://localhost:9091"
+  credentials: "insecure"

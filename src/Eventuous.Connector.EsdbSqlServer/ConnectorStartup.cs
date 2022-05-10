@@ -4,6 +4,7 @@ using Eventuous.Connector.Base.Config;
 using Eventuous.Connector.Base.Diag;
 using Eventuous.Connector.Base.Grpc;
 using Eventuous.Connector.Base.Serialization;
+using Eventuous.Connector.Base.Tools;
 using Eventuous.Connector.EsdbSqlServer.Config;
 using Eventuous.EventStore.Subscriptions;
 using Eventuous.Subscriptions.Registrations;
@@ -76,11 +77,7 @@ public class ConnectorStartup : IConnectorStartup {
                 b => {
                     b.UseCheckpointStore<SqlCheckpointStore>();
                     b.WithPartitioningByStream(concurrencyLimit);
-
-                    var grpcUri = Ensure.NotEmptyString(config.Grpc?.Uri, "gRPC projector URI");
-                    b.AddConsumeFilterLast(
-                        new GrpcProjectionFilter(grpcUri)
-                    );
+                    b.AddGrpcProjector(config.Grpc);
                 }
             );
 
