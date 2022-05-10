@@ -61,7 +61,7 @@ public class ConnectorStartup : IConnectorStartup {
         var concurrencyLimit = config.Source.ConcurrencyLimit;
 
         var getTransform =
-            (IServiceProvider _) => new GrpcTransform<MongoJsonProjectOptions, ProjectionResult>(
+            (IServiceProvider _) => new GrpcTransform<MongoJsonProjectOptions>(
                 Ensure.NotEmptyString(config.Target.Collection, "MongoDB collection")
             );
 
@@ -82,7 +82,7 @@ public class ConnectorStartup : IConnectorStartup {
                     var grpcUri = Ensure.NotEmptyString(config.Grpc?.Uri, "gRPC projector URI");
 
                     b.AddConsumeFilterLast(
-                        new GrpcProjectionFilter<Projection.ProjectionClient, ProjectionResult>(grpcUri)
+                        new GrpcProjectionFilter(grpcUri)
                     );
                 }
             );

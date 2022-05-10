@@ -3,7 +3,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <EventuousVersion>0.8.1-alpha.0.7</EventuousVersion>
+        <EventuousVersion>0.8.1</EventuousVersion>
         <OtelVersion>1.3.0-beta.1</OtelVersion>
         <OtelExtensionsVersion>1.0.0-rc9.3</OtelExtensionsVersion>
         <RepoRoot>$([System.IO.Directory]::GetParent($(MSBuildThisFileDirectory)).Parent.FullName)</RepoRoot>
@@ -11,7 +11,7 @@
 
     <ItemGroup Condition="'$(IsTestProject)' != 'true'">
         <PackageReference Include="MinVer" Version="3.1.0" PrivateAssets="All"/>
-        <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" PrivateAssets="All"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" PrivateAssets="All"/>
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
         <None Include="$(RepoRoot)\e-logo.png" Pack="true" PackagePath="\"/>
         <Using Include="JetBrains.Annotations"/>

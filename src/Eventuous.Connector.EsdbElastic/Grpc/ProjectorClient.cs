@@ -4,8 +4,8 @@ using Eventuous.Connector.Base.Grpc;
 
 namespace Eventuous.Connector.EsdbElastic;
 
-public static partial class Projection {
-    public partial class ProjectionClient : IProjectorClient<ProjectionResult> { }
-}
-
-public partial class ProjectionResult : IProjectionResult { }
+// public static partial class Projection {
+//     public partial class ProjectionClient : IProjectorClient<ProjectionContext> { }
+// }
+//
+// public partial class ProjectionResult : IProjectionResult { }

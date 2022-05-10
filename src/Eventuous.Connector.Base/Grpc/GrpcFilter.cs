@@ -3,22 +3,21 @@ using System.Text;
 using Eventuous.Diagnostics;
 using Eventuous.Subscriptions.Context;
 using Eventuous.Subscriptions.Filters;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
 namespace Eventuous.Connector.Base.Grpc;
 
-public sealed class GrpcProjectionFilter<TClient, TResult> : ConsumeFilter<DelayedAckConsumeContext>, IAsyncDisposable
-    where TClient : ClientBase<TClient>, IProjectorClient<TResult>
-    where TResult : IProjectionResult {
-    readonly Projector<TClient, TResult> _projector;
+public sealed class GrpcProjectionFilter : ConsumeFilter<DelayedAckConsumeContext>, IAsyncDisposable {
+    readonly Projector _projector;
 
     public GrpcProjectionFilter(string host) {
-        _projector = new Projector<TClient, TResult>(host, ChannelCredentials.Insecure, Handler);
+        _projector = new Projector(host, ChannelCredentials.Insecure, Handler);
         _projector.Run(default);
     }
 
-    async Task Handler(TResult result, CancellationToken cancellationToken) {
-        var ctx = _contexts.Single(x => x.Context.MessageId == result.Context.EventId);
+    async Task Handler(ProjectionResponse result, CancellationToken cancellationToken) {
+        var ctx = _contexts.Single(x => x.Context.MessageId == result.EventId);
 
         using var activity = Start();
         _contexts.Remove(ctx);
@@ -45,11 +44,11 @@ public sealed class GrpcProjectionFilter<TClient, TResult> : ConsumeFilter<Delay
         var json = Encoding.UTF8.GetString((context.Message as byte[])!);
 
         await _projector.Project(
-            new ProjectionContext {
-                Stream    = context.Stream,
-                EventType = context.MessageType,
-                EventId   = context.MessageId,
-                EventJson = json
+            new ProjectionRequest {
+                Stream       = context.Stream,
+                EventType    = context.MessageType,
+                EventId      = context.MessageId,
+                EventPayload = Struct.Parser.ParseJson(json)
             }
         );
     }

@@ -1,4 +1,3 @@
-using Eventuous.Connector.Base.Tools;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Configuration;
@@ -6,8 +5,7 @@ using Serilog;
 
 namespace Eventuous.Connector.Base.Grpc;
 
-public sealed class Projector<TClient, TResponse> : IAsyncDisposable
-    where TClient : ClientBase<TClient>, IProjectorClient<TResponse> {
+public sealed class Projector : IAsyncDisposable{
     readonly MethodConfig _defaultMethodConfig = new() {
         Names = { MethodName.Default },
         RetryPolicy = new RetryPolicy {
@@ -19,16 +17,16 @@ public sealed class Projector<TClient, TResponse> : IAsyncDisposable
         }
     };
 
-    readonly TClient                                  _client;
-    readonly Func<TResponse, CancellationToken, Task> _handler;
+    readonly Projection.ProjectionClient              _client;
+    readonly Func<ProjectionResponse, CancellationToken, Task> _handler;
 
     Task?                    _readTask;
     CancellationTokenSource? _cts;
     CancellationToken        _ct;
 
-    AsyncDuplexStreamingCall<ProjectionContext, TResponse>? _call;
+    AsyncDuplexStreamingCall<ProjectionRequest, ProjectionResponse>? _call;
 
-    public Projector(string host, ChannelCredentials? credentials, Func<TResponse, CancellationToken, Task> handler) {
+    public Projector(string host, ChannelCredentials? credentials, Func<ProjectionResponse, CancellationToken, Task> handler) {
         _handler = handler;
 
         var channel = GrpcChannel.ForAddress(
@@ -39,7 +37,7 @@ public sealed class Projector<TClient, TResponse> : IAsyncDisposable
             }
         );
 
-        _client = CreateInstance(channel);
+        _client = new Projection.ProjectionClient(channel);
     }
 
     public void Run(CancellationToken cancellationToken) {
@@ -63,6 +61,10 @@ public sealed class Projector<TClient, TResponse> : IAsyncDisposable
     }
 
     async Task Resubscribe() {
+        if (_disposing) {
+            return;
+        }
+        
         _cts?.Cancel();
         _call?.Dispose();
 
@@ -83,10 +85,10 @@ public sealed class Projector<TClient, TResponse> : IAsyncDisposable
         Run(_ct);
     }
 
-    public async Task Project(ProjectionContext projectionContext) {
+    public async Task Project(ProjectionRequest projectionContext) {
         var retry = 100;
 
-        while (retry-- > 0) {
+        while (retry-- > 0 && !_disposing) {
             var r = await ProjectInternal();
 
             if (r == ProjectResult.Ok) {
@@ -101,6 +103,10 @@ public sealed class Projector<TClient, TResponse> : IAsyncDisposable
                 await _call!.RequestStream.WriteAsync(projectionContext);
                 return ProjectResult.Ok;
             }
+            catch (ObjectDisposedException) {
+                await Resubscribe();
+                return ProjectResult.Retry;
+            }
             catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable) {
                 await Resubscribe();
                 return ProjectResult.Retry;
@@ -112,7 +118,14 @@ public sealed class Projector<TClient, TResponse> : IAsyncDisposable
         }
     }
 
+    bool _disposing;
+
     public async ValueTask DisposeAsync() {
+        if (_disposing) {
+            return;
+        }
+
+        _disposing = true;
         Log.Information("[Grpc] Disconnecting...");
         _cts?.Cancel();
 
@@ -133,24 +146,6 @@ public sealed class Projector<TClient, TResponse> : IAsyncDisposable
         }
         catch (OperationCanceledException) { }
         catch (RpcException e) when (e.StatusCode == StatusCode.Cancelled) { }
-    }
-
-    static TClient CreateInstance(ChannelBase channel) {
-        var constructors = typeof(TClient).GetConstructors<ChannelBase>();
-
-        if (constructors.Length != 1) {
-            throw new InvalidOperationException(
-                $"{typeof(TClient).Name} must have a single constructor that takes a ChannelBase"
-            );
-        }
-
-        var (ctor, _) = constructors[0];
-        object[] args = { channel };
-
-        if (ctor.Invoke(args) is not TClient instance)
-            throw new InvalidOperationException($"Unable to instantiate {typeof(TClient)}");
-
-        return instance;
     }
 }
 

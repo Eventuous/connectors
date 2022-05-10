@@ -1,11 +1,10 @@
-using Eventuous.Producers;
+using Eventuous.Connector.Base.Grpc;
 using Eventuous.Producers.Diagnostics;
 using Microsoft.Extensions.Logging;
-using static Eventuous.Connector.EsdbSqlServer.ProjectionResult;
 
 namespace Eventuous.Connector.EsdbSqlServer;
 
-public class SqlProjector : BaseProducer<SqlServerProjectOptions> {
+public class SqlProjector : GrpcProjectingProducer<SqlProjector, SqlServerProjectOptions> {
     readonly GetConnection                    _getConnection;
     readonly ILogger<SqlServerProjectOptions> _log;
 
@@ -13,6 +12,8 @@ public class SqlProjector : BaseProducer<SqlServerProjectOptions> {
         : base(false, TracingOptions) {
         _getConnection = getConnection;
         _log           = logger;
+
+        On<Execute>((message, token) => ExecuteSql(message.Message, token));
     }
 
     static readonly ProducerTracingOptions TracingOptions = new() {
@@ -21,38 +22,9 @@ public class SqlProjector : BaseProducer<SqlServerProjectOptions> {
         ProduceOperation = "project"
     };
 
-    protected override async Task ProduceMessages(
-        StreamName                   stream,
-        IEnumerable<ProducedMessage> messages,
-        SqlServerProjectOptions?     options,
-        CancellationToken            cancellationToken = default
-    ) {
-        // One-by-one, we'll process each message. In reality, the projector will always handle just a single message
-        foreach (var message in messages) {
-            await ProduceLocal(message);
-        }
-
-        async Task ProduceLocal(ProducedMessage message) {
-            if (message.Message is not ProjectionResult projectionResult
-             || projectionResult.OperationCase == OperationOneofCase.Ignore) {
-                return;
-            }
-
-            try {
-                _log.LogDebug("Executing SQL {sql}", projectionResult.Execute.Sql);
-                await _getConnection.ExecuteNonQuery(projectionResult.Execute.Sql, _ => { }, cancellationToken);
-                await message.Ack<SqlProjector>();
-            }
-            catch (Exception e) {
-                _log.LogError(
-                    "Failed to project event {id} because {reason}",
-                    projectionResult.Context.EventId,
-                    e.Message
-                );
-
-                await message.Nack<SqlProjector>("Failed to project event", e);
-            }
-        }
+    async Task ExecuteSql(Execute execute, CancellationToken cancellationToken) {
+        _log.LogDebug("Executing SQL {sql}", execute.Sql);
+        await _getConnection.ExecuteNonQuery(execute.Sql, _ => { }, cancellationToken);
     }
 }
 
