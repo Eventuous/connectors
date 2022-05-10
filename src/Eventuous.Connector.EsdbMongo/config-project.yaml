@@ -14,6 +14,7 @@ source:
   concurrencyLimit: 1
 target:
   connectionString: "mongodb://mongoadmin:secret@localhost:27017"
+  database: test
   collection: bookings
 grpc:
   uri: "http://localhost:9091"

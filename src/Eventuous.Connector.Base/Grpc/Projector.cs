@@ -61,6 +61,10 @@ public sealed class Projector : IAsyncDisposable{
     }
 
     async Task Resubscribe() {
+        if (_disposing) {
+            return;
+        }
+        
         _cts?.Cancel();
         _call?.Dispose();
 
@@ -84,7 +88,7 @@ public sealed class Projector : IAsyncDisposable{
     public async Task Project(ProjectionRequest projectionContext) {
         var retry = 100;
 
-        while (retry-- > 0) {
+        while (retry-- > 0 && !_disposing) {
             var r = await ProjectInternal();
 
             if (r == ProjectResult.Ok) {
@@ -99,6 +103,10 @@ public sealed class Projector : IAsyncDisposable{
                 await _call!.RequestStream.WriteAsync(projectionContext);
                 return ProjectResult.Ok;
             }
+            catch (ObjectDisposedException) {
+                await Resubscribe();
+                return ProjectResult.Retry;
+            }
             catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable) {
                 await Resubscribe();
                 return ProjectResult.Retry;
@@ -110,7 +118,14 @@ public sealed class Projector : IAsyncDisposable{
         }
     }
 
+    bool _disposing;
+
     public async ValueTask DisposeAsync() {
+        if (_disposing) {
+            return;
+        }
+
+        _disposing = true;
         Log.Information("[Grpc] Disconnecting...");
         _cts?.Cancel();
 

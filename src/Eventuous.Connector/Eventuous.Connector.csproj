@@ -13,8 +13,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj"/>
         <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj"/>
-<!--        <ProjectReference Include="..\Eventuous.Connector.EsdbMongo\Eventuous.Connector.EsdbMongo.csproj"/>-->
-<!--        <ProjectReference Include="..\Eventuous.Connector.EsdbSqlServer\Eventuous.Connector.EsdbSqlServer.csproj"/>-->
+        <ProjectReference Include="..\Eventuous.Connector.EsdbMongo\Eventuous.Connector.EsdbMongo.csproj"/>
+        <ProjectReference Include="..\Eventuous.Connector.EsdbSqlServer\Eventuous.Connector.EsdbSqlServer.csproj"/>
     </ItemGroup>
 
     <ItemGroup Condition="$(Configuration) == 'Debug'">
