@@ -1,0 +1,59 @@
+apiVersion: {{ template "deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ template "connector.fullname" . }}
+  labels:
+    app: {{ template "connector.name" . }}
+    chart: {{ template "connector.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    tier: {{ .Values.tier }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "connector.name" . }}
+      release: {{ .Release.Name }}
+      tier: {{ .Values.tier }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "connector.name" . }}
+        release: {{ .Release.Name }}
+        tier: {{ .Values.tier }}
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- with .Values.imagePullSecrets }}
+        imagePullSecrets:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        ports:
+          - containerPort: 5000
+            name: web
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+            scheme: HTTP
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 5000
+            scheme: HTTP
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+      {{- if .Values.sidecar }}
+      - name: {{ .Chart.Name }}-sidecar
+        {{- with .Values.sidecar}}
+        image: "{{ .image.registry }}/{{ .image.repository }}:{{ .image.tag | default "latest" }}"
+        resources:
+          {{- toYaml .resources | nindent 10 }}
+        ports:
+          - containerPort: {{ .port }}
+            name: grpc
+        {{- end }}
+      {{ end -}}

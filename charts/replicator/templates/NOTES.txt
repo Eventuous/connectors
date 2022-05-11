@@ -1,0 +1,1 @@
+Eventuous Connector has been deployed. It might take some time before the pod starts.

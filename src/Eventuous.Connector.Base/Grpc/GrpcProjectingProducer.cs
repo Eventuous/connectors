@@ -46,6 +46,7 @@ public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOption
 
     async Task Project(ProducedMessage message, StreamName streamName, CancellationToken cancellationToken) {
         if (message.Message is not ProjectionResponse response || response.Operation.Is(Ignore.Descriptor)) {
+            await message.Ack<T>().NoContext();
             return;
         }
         

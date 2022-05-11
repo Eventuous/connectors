@@ -5,6 +5,7 @@ using Eventuous.Subscriptions.Context;
 using Eventuous.Subscriptions.Filters;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Serilog;
 
 namespace Eventuous.Connector.Base.Grpc;
 
@@ -18,6 +19,8 @@ public sealed class GrpcProjectionFilter : ConsumeFilter<DelayedAckConsumeContex
 
     async Task Handler(ProjectionResponse result, CancellationToken cancellationToken) {
         var ctx = _contexts.Single(x => x.Context.MessageId == result.EventId);
+        
+        Log.Verbose("Received {EventId}", result.EventId);
 
         using var activity = Start();
         _contexts.Remove(ctx);

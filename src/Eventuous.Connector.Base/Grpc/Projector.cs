@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Eventuous.Connector.Base.Grpc;
 
-public sealed class Projector : IAsyncDisposable{
+public sealed class Projector : IAsyncDisposable {
     readonly MethodConfig _defaultMethodConfig = new() {
         Names = { MethodName.Default },
         RetryPolicy = new RetryPolicy {
@@ -17,7 +17,7 @@ public sealed class Projector : IAsyncDisposable{
         }
     };
 
-    readonly Projection.ProjectionClient              _client;
+    readonly Projection.ProjectionClient                       _client;
     readonly Func<ProjectionResponse, CancellationToken, Task> _handler;
 
     Task?                    _readTask;
@@ -26,7 +26,11 @@ public sealed class Projector : IAsyncDisposable{
 
     AsyncDuplexStreamingCall<ProjectionRequest, ProjectionResponse>? _call;
 
-    public Projector(string host, ChannelCredentials credentials, Func<ProjectionResponse, CancellationToken, Task> handler) {
+    public Projector(
+        string                                            host,
+        ChannelCredentials                                credentials,
+        Func<ProjectionResponse, CancellationToken, Task> handler
+    ) {
         _handler = handler;
 
         var channel = GrpcChannel.ForAddress(
@@ -64,7 +68,7 @@ public sealed class Projector : IAsyncDisposable{
         if (_disposing) {
             return;
         }
-        
+
         _cts?.Cancel();
         _call?.Dispose();
 
@@ -85,7 +89,7 @@ public sealed class Projector : IAsyncDisposable{
         Run(_ct);
     }
 
-    public async Task Project(ProjectionRequest projectionContext) {
+    public async Task Project(ProjectionRequest request) {
         var retry = 100;
 
         while (retry-- > 0 && !_disposing) {
@@ -100,7 +104,8 @@ public sealed class Projector : IAsyncDisposable{
 
         async Task<ProjectResult> ProjectInternal() {
             try {
-                await _call!.RequestStream.WriteAsync(projectionContext);
+                Log.Verbose("Sending {EventType} {EventId}", request.EventType, request.EventId);
+                await _call!.RequestStream.WriteAsync(request);
                 return ProjectResult.Ok;
             }
             catch (ObjectDisposedException) {

@@ -1,0 +1,53 @@
+image:
+  registry: docker.io
+  repository: eventuous/connector
+  tag: "latest"
+  pullPolicy: IfNotPresent
+imagePullSecrets:  []
+nameOverride: ""
+fullnameOverride: ""
+tier: "connector"
+
+prometheus:
+  metrics: false
+  operator: false
+terminationGracePeriodSeconds: 300
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 150m
+    memory: 256Mi
+connector:
+  connectorId: "esdb-mongo-connector"
+  connectorAssembly: "Eventuous.Connector.EsdbMongo"
+  diagnostics:
+    tracing:
+      enabled: true
+      exporters: [zipkin]
+    metrics:
+      enabled: true
+      exporters: [prometheus]
+    traceSamplerProbability: 0
+source:
+  connectionString: ""
+  concurrencyLimit: 10
+target:
+  connectionString: ""
+  database: ""
+  collection: ""
+sidecar:
+  image:
+    registry: gcr.io
+    repository: sample/sidecar
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  port: 9091
