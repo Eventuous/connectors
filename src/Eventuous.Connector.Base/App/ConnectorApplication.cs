@@ -6,7 +6,9 @@ using Eventuous.Diagnostics.OpenTelemetry;
 using Eventuous.Producers;
 using Eventuous.Subscriptions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -29,6 +31,13 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig>
         Config = Builder.Configuration.GetConnectorConfig<TSourceConfig, TTargetConfig>();
         Builder.Services.AddSingleton(Config.Source);
         Builder.Services.AddSingleton(Config.Target);
+
+        Builder.Services.AddHealthChecks()
+            .AddSubscriptionsHealthCheck(
+                Config.Connector.ServiceName,
+                HealthStatus.Degraded,
+                new[] { Config.Connector.ConnectorId }
+            );
 
         if (!Config.Connector.Diagnostics.Enabled) {
             Environment.SetEnvironmentVariable("EVENTUOUS_DISABLE_DIAGS", "1");
@@ -140,6 +149,8 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig>
         }
 
         var app = Builder.Build();
+        app.MapHealthChecks("/health");
+        app.MapGet("/ping", context => context.Response.WriteAsync("pong"));
         return new ConnectorApp(app);
     }
 }

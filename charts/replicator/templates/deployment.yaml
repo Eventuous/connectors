@@ -31,9 +31,13 @@ spec:
         imagePullSecrets:
           {{- toYaml . | nindent 8 }}
         {{- end }}
+        volumeMounts:
+        - name: {{ .Chart.Name }}-config  
+          mountPath: /app
+          readOnly: true
         ports:
-          - containerPort: 5000
-            name: web
+        - containerPort: 5000
+          name: web
         livenessProbe:
           httpGet:
             path: /health
@@ -57,3 +61,8 @@ spec:
             name: grpc
         {{- end }}
       {{ end -}}
+      volumes:
+      - name: {{ .Chart.Name }}-config
+        secret:
+          secretName: {{ .Chart.Name }}
+          optional: false
