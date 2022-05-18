@@ -26,6 +26,7 @@ public static class Logging {
             .MinimumLevel.Override("Grpc", LogEventLevel.Fatal)
             .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore.Routing.EndpointMiddleware", LogEventLevel.Warning)
             .Enrich.FromLogContext();
 
         logConfig = configure?.Invoke(logConfig) ?? logConfig;
