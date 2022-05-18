@@ -150,7 +150,7 @@ public class ConnectorStartup : IConnectorStartup {
                 b => {
                     b.UseCheckpointStore<ElasticCheckpointStore>();
                     b.WithPartitioningByStream(concurrencyLimit);
-                    b.AddGrpcProjector(config.Grpc);
+                    b.AddGrpcProjector(config.Grpc, concurrencyLimit);
                 }
             );
 

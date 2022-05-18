@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Eventuous.Connector.Base.Grpc;
 
-public sealed class Projector : IAsyncDisposable{
+public sealed class Projector : IAsyncDisposable {
     readonly MethodConfig _defaultMethodConfig = new() {
         Names = { MethodName.Default },
         RetryPolicy = new RetryPolicy {
@@ -17,7 +17,7 @@ public sealed class Projector : IAsyncDisposable{
         }
     };
 
-    readonly Projection.ProjectionClient              _client;
+    readonly Projection.ProjectionClient                       _client;
     readonly Func<ProjectionResponse, CancellationToken, Task> _handler;
 
     Task?                    _readTask;
@@ -26,7 +26,11 @@ public sealed class Projector : IAsyncDisposable{
 
     AsyncDuplexStreamingCall<ProjectionRequest, ProjectionResponse>? _call;
 
-    public Projector(string host, ChannelCredentials credentials, Func<ProjectionResponse, CancellationToken, Task> handler) {
+    public Projector(
+        string                                            host,
+        ChannelCredentials                                credentials,
+        Func<ProjectionResponse, CancellationToken, Task> handler
+    ) {
         _handler = handler;
 
         var channel = GrpcChannel.ForAddress(
@@ -47,6 +51,8 @@ public sealed class Projector : IAsyncDisposable{
 
         _call = _client.Project(cancellationToken: linked.Token);
 
+        _call.RequestStream.WriteOptions = new WriteOptions(WriteFlags.BufferHint);
+
         async Task HandleResponses() {
             Log.Information("[Grpc] Subscribing...");
 
@@ -64,7 +70,7 @@ public sealed class Projector : IAsyncDisposable{
         if (_disposing) {
             return;
         }
-        
+
         _cts?.Cancel();
         _call?.Dispose();
 
@@ -103,7 +109,7 @@ public sealed class Projector : IAsyncDisposable{
                 await _call!.RequestStream.WriteAsync(projectionContext);
                 return ProjectResult.Ok;
             }
-            catch (InvalidOperationException e) 
+            catch (InvalidOperationException e)
                 when (e.Message.Contains("previous write is in progress")) {
                 // TODO: this is a hack, it needs to open multiple streams for concurrent projectors
                 Log.Warning("[Grpc] Write already in progress");

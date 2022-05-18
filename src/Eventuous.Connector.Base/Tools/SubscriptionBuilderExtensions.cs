@@ -5,8 +5,8 @@ using Eventuous.Subscriptions.Registrations;
 namespace Eventuous.Connector.Base.Tools;
 
 public static class SubscriptionBuilderExtensions {
-    public static void AddGrpcProjector(this SubscriptionBuilder builder, GrpcProjectorSettings? settings)
+    public static void AddGrpcProjector(this SubscriptionBuilder builder, GrpcProjectorSettings? settings, uint partitionCount)
         => builder.AddConsumeFilterLast(
-            new GrpcProjectionFilter(settings.GetHost(), settings.GetCredentials())
+            new GrpcProjectionFilter(settings.GetHost(), settings.GetCredentials(), (int)partitionCount)
         );
 }

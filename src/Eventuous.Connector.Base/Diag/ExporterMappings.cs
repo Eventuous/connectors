@@ -13,7 +13,7 @@ public class ExporterMappings<T> {
     public void RegisterExporters(T provider, string[]? exporters) {
         var name = typeof(T).Name;
         if (exporters == null) {
-            Log.Information("No exporters specified for {name}", name);
+            Log.Warning("No exporters for {name} available", name);
             return;
         }
 
@@ -21,6 +21,9 @@ public class ExporterMappings<T> {
             if (_mappings.TryGetValue(exporter, out var addExporter)) {
                 Log.Information("Adding exporter {exporter} for {name}", exporter, name);
                 addExporter(provider);
+            }
+            else {
+                Log.Information("No exporters specified for {exporter}", exporter);
             }
         }
     }

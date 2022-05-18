@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using System.Text;
-using Eventuous.Diagnostics;
 using Eventuous.Subscriptions.Context;
 using Eventuous.Subscriptions.Filters;
 using Google.Protobuf.WellKnownTypes;
@@ -9,58 +6,38 @@ using Grpc.Core;
 namespace Eventuous.Connector.Base.Grpc;
 
 public sealed class GrpcProjectionFilter : ConsumeFilter<DelayedAckConsumeContext>, IAsyncDisposable {
-    readonly Projector _projector;
+    readonly Projector[]           _projectors;
+    readonly GrpcResponseHandler[] _responseHandlers;
 
-    public GrpcProjectionFilter(string host, ChannelCredentials credentials) {
-        _projector = new Projector(host, credentials, Handler);
-        _projector.Run(default);
-    }
+    public GrpcProjectionFilter(string host, ChannelCredentials credentials, int partitionCount) {
+        _projectors       = new Projector[partitionCount];
+        _responseHandlers = new GrpcResponseHandler[partitionCount];
 
-    async Task Handler(ProjectionResponse result, CancellationToken cancellationToken) {
-        var ctx = _contexts.Single(x => x.Context.MessageId == result.EventId);
-
-        using var activity = Start();
-        _contexts.Remove(ctx);
-        await ctx.Next!(ctx.Context.WithItem("projectionResult", result));
-
-        Activity? Start()
-            => ctx.TraceId == null || ctx.SpanId == null ? null
-                : EventuousDiagnostics.ActivitySource.StartActivity(
-                    ActivityKind.Producer,
-                    new ActivityContext(
-                        ctx.TraceId.Value,
-                        ctx.SpanId.Value,
-                        ActivityTraceFlags.Recorded
-                    )
-                );
+        for (var i = 0; i < partitionCount; i++) {
+            var responseHandler = new GrpcResponseHandler();
+            var projector       = new Projector(host, credentials, responseHandler.Handler);
+            projector.Run(default);
+            _projectors[i]       = projector;
+            _responseHandlers[i] = responseHandler;
+        }
     }
 
     public override async ValueTask Send(
         DelayedAckConsumeContext                   context,
         Func<DelayedAckConsumeContext, ValueTask>? next
     ) {
-        var activity = context.Items.TryGetItem<Activity>("activity");
-        _contexts.Add(new LocalContext(context, next, activity?.Context.TraceId, activity?.Context.SpanId));
-        var json = Encoding.UTF8.GetString((context.Message as byte[])!);
+        var json = _responseHandlers[context.PartitionId].Prepare(context, next);
 
-        await _projector.Project(
-            new ProjectionRequest {
-                Stream       = context.Stream,
-                EventType    = context.MessageType,
-                EventId      = context.MessageId,
-                EventPayload = Struct.Parser.ParseJson(json)
-            }
-        );
+        await _projectors[context.PartitionId]
+            .Project(
+                new ProjectionRequest {
+                    Stream       = context.Stream,
+                    EventType    = context.MessageType,
+                    EventId      = context.MessageId,
+                    EventPayload = Struct.Parser.ParseJson(json)
+                }
+            );
     }
 
-    public ValueTask DisposeAsync() => _projector.DisposeAsync();
-
-    record LocalContext(
-        DelayedAckConsumeContext                   Context,
-        Func<DelayedAckConsumeContext, ValueTask>? Next,
-        ActivityTraceId?                           TraceId,
-        ActivitySpanId?                            SpanId
-    );
-
-    readonly List<LocalContext> _contexts = new();
+    public async ValueTask DisposeAsync() => await _projectors.Select(x => x.DisposeAsync()).WhenAll();
 }
