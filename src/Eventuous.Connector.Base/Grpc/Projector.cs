@@ -104,7 +104,7 @@ public sealed class Projector : IAsyncDisposable{
                 return ProjectResult.Ok;
             }
             catch (InvalidOperationException e) 
-                when (e.Message == "Can't write the message because the previous write is in progress") {
+                when (e.Message.Contains("previous write is in progress")) {
                 // TODO: this is a hack, it needs to open multiple streams for concurrent projectors
                 Log.Warning("[Grpc] Write already in progress");
                 return ProjectResult.Retry;
