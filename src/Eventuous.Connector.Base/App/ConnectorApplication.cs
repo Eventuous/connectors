@@ -7,6 +7,7 @@ using Eventuous.Producers;
 using Eventuous.Subscriptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -134,6 +135,13 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig>
 
     public ConnectorApp Build() {
         Builder.ConfigureSerilog(_minimumLogLevel, _sinkConfiguration, _configureLogger);
+
+        Builder.Services.AddHealthChecks()
+            .AddSubscriptionsHealthCheck(
+                "Subscriptions",
+                HealthStatus.Unhealthy,
+                new[] { Config.Connector.ConnectorId }
+            );
 
         if (!_otelAdded) {
             AddOpenTelemetry();

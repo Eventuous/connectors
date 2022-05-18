@@ -93,6 +93,8 @@ public class StartupBuilder {
         }
 
         _app.Host.AddEventuousLogs();
+        _app.Host.MapGet("ping", ctx => ctx.Response.WriteAsync("pong"));
+        _app.Host.MapHealthChecks("/health");
 
         _log.Information("Starting connector application");
         return _app.Run();
