@@ -11,7 +11,7 @@ using Serilog.Core;
 
 namespace Eventuous.Connector;
 
-public class StartupBuilder {
+sealed class StartupBuilder : IDisposable {
     ConnectorConfig? _config;
     ConnectorApp?    _app;
     string?          _configFile;
@@ -19,8 +19,8 @@ public class StartupBuilder {
     readonly Logger _log;
 
     public StartupBuilder() {
-        var logConfig = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console();
-        _log = logConfig.CreateLogger();
+        var env = new StartupEnvironment();
+        _log = Logging.GetLogger(env);
     }
 
     public StartupBuilder Configure(string configFile, string[] args) {
@@ -57,15 +57,15 @@ public class StartupBuilder {
             : _config.Connector.ConnectorAssembly + ".dll";
 
         _log.Information("Loading connector assembly {assemblyFileName}", assemblyFileName);
-        
+
         var assembly = Assembly.LoadFrom(Path.Join(path, assemblyFileName));
         var startup  = assembly.GetTypes().FirstOrDefault(x => x.IsAssignableTo(typeof(IConnectorStartup)));
-        
+
         if (startup == null) {
             _log.Fatal("Connector assembly must have an implementation of IConnectorStartup");
             throw new ApplicationException();
         }
-        
+
         var startupInstance = Activator.CreateInstance(startup) as IConnectorStartup;
 
         _log.Information("Building connector application");
@@ -75,7 +75,7 @@ public class StartupBuilder {
         return this;
     }
 
-    public Task<int> Run() {
+    public async Task<int> Run() {
         if (_config == null) {
             _log.Fatal("Call Configure() first");
             throw new ApplicationException();
@@ -87,7 +87,9 @@ public class StartupBuilder {
         }
 
         if (_config.Connector.Diagnostics.Enabled && _config.Connector.Diagnostics.Metrics?.Enabled == true
-         && _config.Connector.Diagnostics.Metrics.Exporters?.Any(x => x == "prometheus")            == true) {
+                                                  && _config.Connector.Diagnostics.Metrics.Exporters?.Any(
+                                                         x => x == "prometheus"
+                                                     ) == true) {
             _log.Information("Adding Prometheus metrics exporter");
             _app.Host.UseOpenTelemetryPrometheusScrapingEndpoint();
         }
@@ -97,6 +99,16 @@ public class StartupBuilder {
         _app.Host.MapHealthChecks("/health");
 
         _log.Information("Starting connector application");
-        return _app.Run();
+
+        try {
+            return await _app.Run();
+        }
+        catch (Exception e) {
+            _log.Fatal(e, "Connector application failed");
+            Log.CloseAndFlush();
+            return -1;
+        }
     }
+
+    public void Dispose() => _log.Dispose();
 }

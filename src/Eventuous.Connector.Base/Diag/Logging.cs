@@ -2,14 +2,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Configuration;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 
 namespace Eventuous.Connector.Base.Diag;
 
 public static class Logging {
-    public static void ConfigureSerilog(
-        this WebApplicationBuilder                          builder,
+    public static Logger GetLogger(
+        IHostEnvironment                                    environment,
         LogEventLevel?                                      minimumLogLevel   = null,
         Func<LoggerSinkConfiguration, LoggerConfiguration>? sinkConfiguration = null,
         Func<LoggerConfiguration, LoggerConfiguration>?     configure         = null
@@ -17,7 +18,7 @@ public static class Logging {
         var sc = sinkConfiguration ?? DefaultSink;
 
         var logLevel = minimumLogLevel
-                    ?? (builder.Environment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information);
+                    ?? (environment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information);
 
         var logConfig = new LoggerConfiguration()
             .MinimumLevel.Is(logLevel)
@@ -29,16 +30,25 @@ public static class Logging {
 
         logConfig = configure?.Invoke(logConfig) ?? logConfig;
 
-        Log.Logger = sc(logConfig.WriteTo).CreateLogger();
-
-        builder.Host.UseSerilog();
+        return sc(logConfig.WriteTo).CreateLogger();
 
         LoggerConfiguration DefaultSink(LoggerSinkConfiguration sinkConfig)
-            => builder.Environment.IsDevelopment()
+            => environment.IsDevelopment()
                 ? sinkConfig.Console(
                     outputTemplate:
                     "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}>;{NewLine}{Exception}"
                 )
                 : sinkConfig.Console(new RenderedCompactJsonFormatter());
+    }
+
+    public static void ConfigureSerilog(
+        this WebApplicationBuilder                          builder,
+        LogEventLevel?                                      minimumLogLevel   = null,
+        Func<LoggerSinkConfiguration, LoggerConfiguration>? sinkConfiguration = null,
+        Func<LoggerConfiguration, LoggerConfiguration>?     configure         = null
+    ) {
+        Log.CloseAndFlush();
+        Log.Logger = GetLogger(builder.Environment, minimumLogLevel, sinkConfiguration, configure);
+        builder.Host.UseSerilog();
     }
 }
