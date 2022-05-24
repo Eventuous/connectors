@@ -149,9 +149,11 @@ services:
       - elastic
 
   connector:
-    image: eventuous/connector:main
+    image: eventuous/connector:latest
     volumes:
       - ./config.yaml:/app/config.yaml
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "5001:5000"
     depends_on:

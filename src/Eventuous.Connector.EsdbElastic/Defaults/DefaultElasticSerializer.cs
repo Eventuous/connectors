@@ -35,7 +35,7 @@ public class DefaultElasticSerializer : IElasticsearchSerializer {
 
         foreach (var jsonElement in doc.RootElement.EnumerateObject()) {
             if (jsonElement.NameEquals("message")) {
-                writer.WritePropertyName("event");
+                writer.WritePropertyName("message");
                 var parsed = JsonDocument.Parse(payload);
                 parsed.WriteTo(writer);
             }

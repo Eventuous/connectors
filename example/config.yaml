@@ -10,10 +10,11 @@ connector:
       exporters: [prometheus]
     traceSamplerProbability: 0
 source:
-  connectionString: "esdb://esdb:2113?tls=false"
-  concurrencyLimit: 10
+  connectionString: "esdb://localhost:2113?tls=false"
+  concurrencyLimit: 1
 target:
-  connectionString: "http://es01:9200"
+  connectionString: "http://localhost:9200"
+  connectorMode: "produce"
   dataStream:
     indexName: "eventlog"
     template:
