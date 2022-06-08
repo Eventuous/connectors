@@ -10,8 +10,10 @@ using Eventuous.EventStore.Subscriptions;
 using Eventuous.Projections.MongoDB;
 using Eventuous.Subscriptions.Registrations;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Polly;
 
 // ReSharper disable ConvertToLocalFunction
 
@@ -79,12 +81,17 @@ public class ConnectorStartup : IConnectorStartup {
                 b => {
                     b.UseCheckpointStore<MongoCheckpointStore>();
                     b.WithPartitioningByStream(concurrencyLimit);
-                    b.AddGrpcProjector(config.Grpc, concurrencyLimit);
+                    b.AddGrpcProjector(config.Grpc);
                 }
             );
 
+        var retryPolicy = Policy
+            .Handle<MongoConnectionException>()
+            .WaitAndRetryForeverAsync(
+                sleepDurationProvider: retryAttempt => TimeSpan.FromMilliseconds(Math.Pow(2, retryAttempt * 100))
+            );
         return builder
-            .ProduceWith<MongoJsonProjector, MongoJsonProjectOptions>()
+            .ProduceWith<MongoJsonProjector, MongoJsonProjectOptions>(retryPolicy)
             .TransformWith(getTransform);
     }
 }

@@ -2,8 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using Eventuous.Gateway;
 using Eventuous.Producers;
 using Eventuous.Subscriptions;
+using Eventuous.Subscriptions.Polly;
 using Eventuous.Subscriptions.Registrations;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Polly;
 
 // ReSharper disable CheckNamespace
 
@@ -42,9 +44,9 @@ public class ConnectorBuilder<TSubscription, TSubscriptionOptions> : ConnectorBu
 
     [PublicAPI]
     public ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>
-        ProduceWith<TProducer, TProduceOptions>(bool awaitProduce = false)
+        ProduceWith<TProducer, TProduceOptions>(IAsyncPolicy? retryPolicy = null, bool awaitProduce = false)
         where TProducer : class, IEventProducer<TProduceOptions> where TProduceOptions : class
-        => new(this, awaitProduce);
+        => new(this, retryPolicy, awaitProduce);
 
     internal void ConfigureOptions(TSubscriptionOptions options) => _configureOptions?.Invoke(options);
 
@@ -61,12 +63,18 @@ public class ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TP
     where TProducer : class, IEventProducer<TProduceOptions>
     where TProduceOptions : class {
     readonly ConnectorBuilder<TSubscription, TSubscriptionOptions> _inner;
+    readonly IAsyncPolicy?                                         _retryPolicy;
     Func<IServiceProvider, IGatewayTransform<TProduceOptions>>?    _getTransformer;
     readonly bool                                                  _awaitProduce;
     Type?                                                          _transformerType;
 
-    public ConnectorBuilder(ConnectorBuilder<TSubscription, TSubscriptionOptions> inner, bool awaitProduce) {
+    public ConnectorBuilder(
+        ConnectorBuilder<TSubscription, TSubscriptionOptions> inner,
+        IAsyncPolicy?                                         retryPolicy,
+        bool                                                  awaitProduce
+    ) {
         _inner        = inner;
+        _retryPolicy  = retryPolicy;
         _awaitProduce = awaitProduce;
     }
 
@@ -100,11 +108,13 @@ public class ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TP
             var transform = sp.GetRequiredService(_transformerType!) as IGatewayTransform<TProduceOptions>;
             var producer  = sp.GetRequiredService<TProducer>();
 
-            return new GatewayHandler<TProduceOptions>(
+            var handler = new GatewayHandler<TProduceOptions>(
                 new GatewayProducer<TProduceOptions>(producer),
                 transform!.RouteAndTransform,
                 _awaitProduce
             );
+
+            return _retryPolicy == null ? handler : new PollyEventHandler(handler, _retryPolicy);
         }
     }
 }

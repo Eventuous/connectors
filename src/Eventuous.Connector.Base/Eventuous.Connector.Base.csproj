@@ -6,6 +6,7 @@
         <PackageReference Include="Eventuous.AspNetCore" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Gateway" Version="$(EventuousVersion)" />
+        <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
         <PackageReference Include="Serilog" Version="2.10.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />

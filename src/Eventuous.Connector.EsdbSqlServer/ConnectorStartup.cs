@@ -77,7 +77,7 @@ public class ConnectorStartup : IConnectorStartup {
                 b => {
                     b.UseCheckpointStore<SqlCheckpointStore>();
                     b.WithPartitioningByStream(concurrencyLimit);
-                    b.AddGrpcProjector(config.Grpc, concurrencyLimit);
+                    b.AddGrpcProjector(config.Grpc);
                 }
             );
 

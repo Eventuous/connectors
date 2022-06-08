@@ -26,8 +26,6 @@ public class MongoJsonProjector : GrpcProjectingProducer<MongoJsonProjector, Mon
         ProduceOperation = "project"
     };
 
-    // var collection = _database.GetCollection<BsonDocument>(stream);
-
     Task InsertOne(string collection, InsertOne insertOne, CancellationToken cancellationToken) {
         _log.LogTrace("Inserting {@Document}", insertOne);
 
