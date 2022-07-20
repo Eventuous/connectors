@@ -12,7 +12,7 @@ public class ElasticJsonProjector : GrpcProjectingProducer<ElasticJsonProjector,
     readonly ILogger<ElasticJsonProjector> _log;
 
     public ElasticJsonProjector(IElasticClient elasticClient, ILogger<ElasticJsonProjector> logger)
-        : base(false, TracingOptions) {
+        : base(TracingOptions) {
         _elasticClient = elasticClient;
         _log           = logger;
 

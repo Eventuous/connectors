@@ -8,8 +8,7 @@ public class SqlProjector : GrpcProjectingProducer<SqlProjector, SqlServerProjec
     readonly GetConnection                    _getConnection;
     readonly ILogger<SqlServerProjectOptions> _log;
 
-    public SqlProjector(GetConnection getConnection, ILogger<SqlServerProjectOptions> logger)
-        : base(false, TracingOptions) {
+    public SqlProjector(GetConnection getConnection, ILogger<SqlServerProjectOptions> logger) : base(TracingOptions) {
         _getConnection = getConnection;
         _log           = logger;
 

@@ -16,6 +16,7 @@ using Eventuous.ElasticSearch.Store;
 using Eventuous.EventStore.Subscriptions;
 using Eventuous.Subscriptions.Registrations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Nest;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -135,7 +136,10 @@ public class ConnectorStartup : IConnectorStartup {
         var indexName = Ensure.NotEmptyString(config.Target.DataStream?.IndexName);
 
         var getTransform =
-            (IServiceProvider _) => new GrpcTransform<ElasticJsonProjectOptions>(indexName);
+            (IServiceProvider sp) => new GrpcTransform<ElasticJsonProjectOptions>(
+                indexName,
+                sp.GetRequiredService<ILogger<GrpcTransform<ElasticJsonProjectOptions>>>()
+            );
 
         var builder = cfg.SubscribeWith<AllStreamSubscription, AllStreamSubscriptionOptions>(
                 Ensure.NotEmptyString(config.Connector.ConnectorId)

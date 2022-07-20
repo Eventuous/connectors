@@ -10,6 +10,7 @@ using Eventuous.EventStore.Subscriptions;
 using Eventuous.Projections.MongoDB;
 using Eventuous.Subscriptions.Registrations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -64,8 +65,9 @@ public class ConnectorStartup : IConnectorStartup {
         var concurrencyLimit = config.Source.ConcurrencyLimit;
 
         var getTransform =
-            (IServiceProvider _) => new GrpcTransform<MongoJsonProjectOptions>(
-                Ensure.NotEmptyString(config.Target.Collection, "MongoDB collection")
+            (IServiceProvider sp) => new GrpcTransform<MongoJsonProjectOptions>(
+                Ensure.NotEmptyString(config.Target.Collection, "MongoDB collection"),
+                sp.GetRequiredService<ILogger<GrpcTransform<MongoJsonProjectOptions>>>()
             );
 
         var builder = cfg.SubscribeWith<AllStreamSubscription, AllStreamSubscriptionOptions>(

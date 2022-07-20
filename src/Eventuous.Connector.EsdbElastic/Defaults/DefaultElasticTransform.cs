@@ -30,7 +30,7 @@ public class DefaultElasticTransform : IGatewayTransform<ElasticProduceOptions> 
         => new(
             ctx.MessageId,
             ctx.MessageType,
-            ctx.StreamPosition,
+            (long)ctx.StreamPosition,
             ctx.ContentType,
             ctx.Stream,
             ctx.GlobalPosition,

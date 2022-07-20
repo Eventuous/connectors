@@ -10,8 +10,7 @@ public class MongoJsonProjector : GrpcProjectingProducer<MongoJsonProjector, Mon
     readonly IMongoDatabase              _database;
     readonly ILogger<MongoJsonProjector> _log;
 
-    public MongoJsonProjector(IMongoDatabase database, ILogger<MongoJsonProjector> log)
-        : base(false, TracingOptions) {
+    public MongoJsonProjector(IMongoDatabase database, ILogger<MongoJsonProjector> log) : base(TracingOptions) {
         _database = database;
         _log      = log;
 
@@ -48,6 +47,7 @@ public class MongoJsonProjector : GrpcProjectingProducer<MongoJsonProjector, Mon
 
     Task DeleteOne(string collection, DeleteOne deleteOne, CancellationToken cancellationToken) {
         _log.LogTrace("Deleting {@Delete}", deleteOne);
+
         return _database
             .GetCollection<BsonDocument>(collection)
             .DeleteOneAsync(new JsonFilterDefinition<BsonDocument>(deleteOne.Filter.ToString()), cancellationToken);

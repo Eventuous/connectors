@@ -9,6 +9,7 @@ using Eventuous.Connector.EsdbSqlServer.Config;
 using Eventuous.EventStore.Subscriptions;
 using Eventuous.Subscriptions.Registrations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
@@ -62,7 +63,10 @@ public class ConnectorStartup : IConnectorStartup {
         var concurrencyLimit = config.Source.ConcurrencyLimit;
 
         var getTransform =
-            (IServiceProvider _) => new GrpcTransform<SqlServerProjectOptions>("dummy");
+            (IServiceProvider sp) => new GrpcTransform<SqlServerProjectOptions>(
+                "dummy",
+                sp.GetRequiredService<ILogger<GrpcTransform<SqlServerProjectOptions>>>()
+            );
 
         var builder = cfg.SubscribeWith<AllStreamSubscription, AllStreamSubscriptionOptions>(
                 Ensure.NotEmptyString(config.Connector.ConnectorId)

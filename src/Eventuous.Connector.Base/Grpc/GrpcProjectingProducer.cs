@@ -9,15 +9,13 @@ namespace Eventuous.Connector.Base.Grpc;
 public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOptions>
     where T : IEventProducer<TOptions>
     where TOptions : class {
-    protected GrpcProjectingProducer(
-        bool                    requiresInit,
-        ProducerTracingOptions? tracingOptions = null
-    )
-        : base(requiresInit, tracingOptions) { }
+    protected GrpcProjectingProducer(ProducerTracingOptions? tracingOptions = null) : base(tracingOptions) { }
 
-    readonly Dictionary<string, Func<ProjectionResponse, StreamName, CancellationToken, Task>> _projectorsByName = new();
+    readonly Dictionary<string, Func<ProjectionResponse, StreamName, CancellationToken, Task>>
+        _projectorsByName = new();
 
-    protected void On<TEvent>(Func<ProjectedMessage<TEvent>, CancellationToken, Task> projector) where TEvent : IMessage<TEvent>, new() {
+    protected void On<TEvent>(Func<ProjectedMessage<TEvent>, CancellationToken, Task> projector)
+        where TEvent : IMessage<TEvent>, new() {
         var temp = new TEvent();
         _projectorsByName.Add(temp.Descriptor.FullName, ProjectAny);
 
@@ -48,7 +46,7 @@ public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOption
         if (message.Message is not ProjectionResponse response || response.Operation.Is(Ignore.Descriptor)) {
             return;
         }
-        
+
         var typeName = Any.GetTypeName(response.Operation.TypeUrl);
 
         if (!_projectorsByName.TryGetValue(typeName, out var projector)) {
