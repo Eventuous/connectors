@@ -9,11 +9,24 @@ message InsertOne {
   google.protobuf.Struct document = 1;
 }
 
+message InsertMany {
+  repeated google.protobuf.Struct documents = 1;
+}
+
 message UpdateOne {
   google.protobuf.Struct filter = 1;
   google.protobuf.Struct update = 2;
 }
 
+message UpdateMany {
+  google.protobuf.Struct filter = 1;
+  google.protobuf.Struct update = 2;
+}
+
 message DeleteOne {
+  google.protobuf.Struct filter = 1;
+}
+
+message DeleteMany {
   google.protobuf.Struct filter = 1;
 }
