@@ -7,12 +7,12 @@
         <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Gateway" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
-        <PackageReference Include="Serilog" Version="2.10.0" />
-        <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+        <PackageReference Include="Serilog" Version="2.12.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
         <PackageReference Include="NetEscapades.Configuration.Yaml" Version="2.2.0" />
-        <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
-        <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.48.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.48.1" PrivateAssets="All" />
     </ItemGroup>
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />

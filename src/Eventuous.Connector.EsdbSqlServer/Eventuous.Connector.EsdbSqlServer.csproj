@@ -7,10 +7,10 @@
         <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
         <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
         <PackageReference Include="EventStore.Client.Grpc" Version="22.0.0" />
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.0" />
         <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="$(OtelExtensionsVersion)" />
         <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="$(OtelExtensionsVersion)" />
-        <PackageReference Include="Grpc.Tools" Version="2.45.0" PrivateAssets="All" />
+        <PackageReference Include="Grpc.Tools" Version="2.48.1" PrivateAssets="All" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
