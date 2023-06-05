@@ -18,6 +18,6 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
     <ItemGroup>
-        <Protobuf Include="Grpc\Protos\project.proto" GrpcServices="Client" />
+      <Folder Include="Grpc\" />
     </ItemGroup>
 </Project>

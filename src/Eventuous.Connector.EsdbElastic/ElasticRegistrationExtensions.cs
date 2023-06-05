@@ -1,4 +1,7 @@
-﻿using Elasticsearch.Net;
+﻿// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
+using Elasticsearch.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
 using static System.String;
@@ -28,7 +31,7 @@ static class ElasticRegistrationExtensions {
         var pool = cloudId != null
             ? new CloudConnectionPool(cloudId, new ApiKeyAuthenticationCredentials(apiKey))
             : new SingleNodeConnectionPool(
-                new Uri(Ensure.NotEmptyString(connectionString, "Elasticsearch connection string"))
+                new Uri(Tools.Ensure.NotEmptyString(connectionString, "Elasticsearch connection string"))
             );
 
         ConnectionSettings.SourceSerializerFactory? serializerFactory = getSerializer != null

@@ -1,35 +1,37 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 using System.Runtime.CompilerServices;
+using Eventuous.Connector.Base.Grpc;
+using Eventuous.Connector.Base.Tools;
 using Eventuous.Subscriptions.Context;
 using Eventuous.Subscriptions.Filters;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
-namespace Eventuous.Connector.Base.Grpc;
+namespace Eventuous.Connector.Filters.Grpc;
 
-public sealed class GrpcProjectionFilter : ConsumeFilter<DelayedAckConsumeContext>, IAsyncDisposable {
+public sealed class GrpcProjectionFilter : ConsumeFilter<AsyncConsumeContext>, IAsyncDisposable {
     GrpcPartition?[]                 _partitions = Array.Empty<GrpcPartition>();
     readonly Func<GrpcPartition>     _partitionFactory;
     readonly CancellationTokenSource _cts;
 
     public GrpcProjectionFilter(string host, ChannelCredentials credentials) {
-        _cts              = new CancellationTokenSource();
+        _cts = new CancellationTokenSource();
         _partitionFactory = () => new GrpcPartition(host, credentials, _cts);
     }
 
     readonly object _lock = new();
 
-    public override async ValueTask Send(
-        DelayedAckConsumeContext                   context,
-        Func<DelayedAckConsumeContext, ValueTask>? next
-    ) {
+    protected override async ValueTask Send(AsyncConsumeContext context, LinkedListNode<IConsumeFilter>? next) {
         var (projector, responseHandler) = GetPartition();
         var json = responseHandler.Prepare(context, next);
 
         await projector.Project(
             new ProjectionRequest {
-                Stream       = context.Stream,
-                EventType    = context.MessageType,
-                EventId      = context.MessageId,
+                Stream = context.Stream,
+                EventType = context.MessageType,
+                EventId = context.MessageId,
                 EventPayload = Struct.Parser.ParseJson(json)
             }
         );
@@ -58,13 +60,9 @@ public sealed class GrpcProjectionFilter : ConsumeFilter<DelayedAckConsumeContex
     }
 
     record GrpcPartition {
-        public GrpcPartition(
-            string                  host,
-            ChannelCredentials      credentials,
-            CancellationTokenSource cts
-        ) {
+        public GrpcPartition(string host, ChannelCredentials credentials, CancellationTokenSource cts) {
             ResponseHandler = new GrpcResponseHandler();
-            Projector       = new Projector(host, credentials, ResponseHandler.Handler);
+            Projector = new Projector(host, credentials, ResponseHandler.Handler);
             Projector.Run(cts.Token);
         }
 
@@ -72,7 +70,7 @@ public sealed class GrpcProjectionFilter : ConsumeFilter<DelayedAckConsumeContex
         public GrpcResponseHandler ResponseHandler { get; }
 
         public void Deconstruct(out Projector projector, out GrpcResponseHandler responseHandler) {
-            projector       = Projector;
+            projector = Projector;
             responseHandler = ResponseHandler;
         }
     }

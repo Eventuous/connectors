@@ -6,13 +6,14 @@
     <ItemGroup>
         <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OtelVersion)" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OtelVersion)" />
-        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.4.0-alpha.2" />
+        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="$(OtelVersion)" />
         <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="$(OtelVersion)" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
         <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj" />
+        <ProjectReference Include="..\Eventuous.Connector.EsdbGenericGrpc\Eventuous.Connector.EsdbGenericGrpc.csproj" />
         <ProjectReference Include="..\Eventuous.Connector.EsdbMongo\Eventuous.Connector.EsdbMongo.csproj" />
         <ProjectReference Include="..\Eventuous.Connector.EsdbSqlServer\Eventuous.Connector.EsdbSqlServer.csproj" />
     </ItemGroup>

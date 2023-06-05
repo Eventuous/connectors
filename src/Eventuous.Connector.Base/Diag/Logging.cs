@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -22,6 +25,7 @@ public static class Logging {
 
         var logConfig = new LoggerConfiguration()
             .MinimumLevel.Is(logLevel)
+            .MinimumLevel.Override("Eventuous", LogEventLevel.Verbose)
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Grpc", LogEventLevel.Fatal)
             .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", LogEventLevel.Warning)

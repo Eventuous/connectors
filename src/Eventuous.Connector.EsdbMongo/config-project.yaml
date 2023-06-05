@@ -16,6 +16,6 @@ target:
   connectionString: "mongodb://mongoadmin:secret@localhost:27017"
   database: test
   collection: bookings
-grpc:
+filter:
   uri: "http://localhost:9091"
   credentials: "insecure"

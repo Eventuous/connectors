@@ -3,17 +3,24 @@
         <IsPackable>true</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
-        <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
-        <PackageReference Include="Eventuous.Projections.MongoDB" Version="$(EventuousVersion)" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="$(OtelExtensionsVersion)" />
-        <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="1.0.0" />
-        <PackageReference Include="Grpc.Tools" Version="2.48.1" PrivateAssets="All" />
+        <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)"/>
+        <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)"/>
+        <PackageReference Include="Eventuous.Projections.MongoDB" Version="$(EventuousVersion)"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="$(OtelExtensionsVersion)"/>
+        <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="1.0.0"/>
+        <PackageReference Include="Grpc.Tools" Version="2.48.1" PrivateAssets="All"/>
     </ItemGroup>
     <ItemGroup>
-        <Protobuf Include="Grpc\Protos\client.proto" GrpcServices="Client" AdditionalImportDirs=".; .." />
+        <Protobuf Include="Grpc\Protos\client.proto" GrpcServices="Client" AdditionalImportDirs=".; .."/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
+        <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj"/>
+        <ProjectReference Include="..\Eventuous.Connector.EsdbBase\Eventuous.Connector.EsdbBase.csproj"/>
+        <ProjectReference Include="..\Eventuous.Connector.Filters.Grpc\Eventuous.Connector.Filters.Grpc.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\Eventuous.Connector.Base\Tools\Ensure.cs">
+            <Link>Tools\Ensure.cs</Link>
+        </Compile>
     </ItemGroup>
 </Project>

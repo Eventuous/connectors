@@ -1,13 +1,13 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 using System.Reflection;
-using Eventuous.AspNetCore;
 using Eventuous.Connector.Base;
 using Eventuous.Connector.Base.App;
 using Eventuous.Connector.Base.Config;
 using Eventuous.Connector.Base.Diag;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using Serilog;
-using Serilog.Core;
 using ILogger = Serilog.ILogger;
 
 namespace Eventuous.Connector;
@@ -21,16 +21,16 @@ sealed class StartupBuilder {
 
     public StartupBuilder(string configFile, string[] args) {
         Serilog.Log.Logger = Logging.GetLogger(new StartupEnvironment());
-        Log.Information("Configuring connector using config file {configFile}", configFile);
-        
+        Log.Information("Configuring connector using config file {ConfigFile}", configFile);
+
         _configFile = configFile;
         var hostBuilder = Host.CreateDefaultBuilder(args);
         hostBuilder.ConfigureHostConfiguration(c => c.AddYamlFile(configFile));
         using var tempHost = hostBuilder.Build();
-        _config = tempHost.Services.GetService<IConfiguration>().Get<ConnectorConfig>();
+        _config = tempHost.Services.GetRequiredService<IConfiguration>().Get<ConnectorConfig>();
 
         if (string.IsNullOrWhiteSpace(_config.Connector.ConnectorAssembly)) {
-            Log.Fatal($"Connector assembly must be specified in {configFile}");
+            Log.Fatal("Connector assembly must be specified in {ConfigFile}", configFile);
             throw new ApplicationException();
         }
     }
@@ -49,9 +49,9 @@ sealed class StartupBuilder {
 
         var assemblyFileName = _config.Connector.ConnectorAssembly.EndsWith("dll")
             ? _config.Connector.ConnectorAssembly
-            : _config.Connector.ConnectorAssembly + ".dll";
+            : $"{_config.Connector.ConnectorAssembly}.dll";
 
-        Log.Information("Loading connector assembly {assemblyFileName}", assemblyFileName);
+        Log.Information("Loading connector assembly {AssemblyFileName}", assemblyFileName);
 
         var assembly = Assembly.LoadFrom(Path.Join(path, assemblyFileName));
         var startup  = assembly.GetTypes().FirstOrDefault(x => x.IsAssignableTo(typeof(IConnectorStartup)));
@@ -81,15 +81,13 @@ sealed class StartupBuilder {
             throw new ApplicationException();
         }
 
-        if (_config.Connector.Diagnostics.Enabled && _config.Connector.Diagnostics.Metrics?.Enabled == true
-                                                  && _config.Connector.Diagnostics.Metrics.Exporters?.Any(
-                                                         x => x == "prometheus"
-                                                     ) == true) {
+        if (_config.Connector.Diagnostics is { Enabled: true, Metrics.Enabled: true }
+         && _config.Connector.Diagnostics.Metrics.Exporters?.Any(x => x == "prometheus") == true) {
             Log.Information("Adding Prometheus metrics exporter");
             _app.Host.UseOpenTelemetryPrometheusScrapingEndpoint();
         }
 
-        _app.Host.AddEventuousLogs();
+        _app.Host.UseEventuousLogs();
         _app.Host.MapGet("ping", ctx => ctx.Response.WriteAsync("pong"));
         _app.Host.MapHealthChecks("/health");
 
@@ -100,7 +98,7 @@ sealed class StartupBuilder {
         }
         catch (Exception e) {
             Log.Fatal(e, "Connector application failed");
-            Serilog.Log.CloseAndFlush();
+            await Serilog.Log.CloseAndFlushAsync();
             return -1;
         }
     }

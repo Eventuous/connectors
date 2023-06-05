@@ -1,10 +1,10 @@
 <Project>
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <EventuousVersion>0.10.6</EventuousVersion>
-        <OtelVersion>1.3.1</OtelVersion>
+        <EventuousVersion>0.14.1-alpha.0.31</EventuousVersion>
+        <OtelVersion>1.5.0-rc.1</OtelVersion>
         <OtelExtensionsVersion>1.0.0-rc9.6</OtelExtensionsVersion>
         <RepoRoot>$([System.IO.Directory]::GetParent($(MSBuildThisFileDirectory)).Parent.FullName)</RepoRoot>
     </PropertyGroup>
@@ -28,7 +28,7 @@
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/eventuous/Eventuous.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <Description>Eventuous connector between EventStoreDB and Elasticsearch</Description>
+        <Description>Eventuous connector between EventStoreDB and other things</Description>
         <Authors>Alexey Zimarev</Authors>
         <Copyright>Ubiquitous AS</Copyright>
         <PackageProjectUrl>https://eventuous.dev</PackageProjectUrl>

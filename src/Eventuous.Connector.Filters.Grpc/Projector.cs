@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Configuration;
@@ -6,13 +9,15 @@ using Serilog;
 namespace Eventuous.Connector.Base.Grpc;
 
 public sealed class Projector : IAsyncDisposable {
+    static readonly ILogger Log = Serilog.Log.ForContext<Projector>();
+
     readonly MethodConfig _defaultMethodConfig = new() {
         Names = { MethodName.Default },
         RetryPolicy = new RetryPolicy {
-            MaxAttempts          = 20,
-            InitialBackoff       = TimeSpan.FromSeconds(1),
-            MaxBackoff           = TimeSpan.FromSeconds(5),
-            BackoffMultiplier    = 1.5,
+            MaxAttempts = 20,
+            InitialBackoff = TimeSpan.FromSeconds(1),
+            MaxBackoff = TimeSpan.FromSeconds(5),
+            BackoffMultiplier = 1.5,
             RetryableStatusCodes = { StatusCode.Unavailable }
         }
     };
@@ -36,7 +41,7 @@ public sealed class Projector : IAsyncDisposable {
         var channel = GrpcChannel.ForAddress(
             host,
             new GrpcChannelOptions {
-                Credentials   = credentials,
+                Credentials = credentials,
                 ServiceConfig = new ServiceConfig { MethodConfigs = { _defaultMethodConfig } }
             }
         );
@@ -46,7 +51,7 @@ public sealed class Projector : IAsyncDisposable {
 
     public void Run(CancellationToken cancellationToken) {
         _cts = new CancellationTokenSource();
-        _ct  = cancellationToken;
+        _ct = cancellationToken;
         var linked = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, _ct);
 
         _call = _client.Project(cancellationToken: linked.Token);
@@ -54,11 +59,11 @@ public sealed class Projector : IAsyncDisposable {
         _call.RequestStream.WriteOptions = new WriteOptions(WriteFlags.BufferHint);
 
         async Task HandleResponses() {
-            Log.Information("[Grpc] Subscribing...");
+            Log.Information("Subscribing...");
 
             await foreach (var response in _call.ResponseStream.ReadAllAsync(cancellationToken: linked.Token)) {
                 // add retries
-                Log.Verbose("[Grpc] Received response: {response}", response);
+                Log.Verbose("Received response: {Response}", response);
                 await _handler(response, linked.Token);
             }
         }
@@ -79,14 +84,14 @@ public sealed class Projector : IAsyncDisposable {
                 await AwaitCancelled(() => _readTask);
             }
             catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable) {
-                Log.Warning("[Grpc] Server unavailable");
+                Log.Warning("Server unavailable");
             }
 
             _readTask.Dispose();
             _readTask = null;
         }
 
-        _cts  = null;
+        _cts = null;
         _call = null;
         Run(_ct);
     }
@@ -101,18 +106,18 @@ public sealed class Projector : IAsyncDisposable {
                 break;
             }
 
-            Log.Information($"[Grpc] Retrying {100 - retry}");
+            Log.Information($"Retrying {100 - retry}");
         }
 
         async Task<ProjectResult> ProjectInternal() {
             try {
-                await _call!.RequestStream.WriteAsync(projectionContext);
+                await _call!.RequestStream.WriteAsync(projectionContext, _ct);
                 return ProjectResult.Ok;
             }
             catch (InvalidOperationException e)
                 when (e.Message.Contains("previous write is in progress")) {
                 // TODO: this is a hack, it needs to open multiple streams for concurrent projectors
-                Log.Warning("[Grpc] Write already in progress");
+                Log.Warning("Write already in progress");
                 return ProjectResult.Retry;
             }
             catch (ObjectDisposedException) {
@@ -124,7 +129,7 @@ public sealed class Projector : IAsyncDisposable {
                 return ProjectResult.Retry;
             }
             catch (Exception e) {
-                Log.Error(e, "[Grpc] Projection failed");
+                Log.Error(e, "Projection failed");
                 throw;
             }
         }
@@ -138,16 +143,16 @@ public sealed class Projector : IAsyncDisposable {
         }
 
         _disposing = true;
-        Log.Information("[Grpc] Disconnecting...");
+        Log.Information("Disconnecting...");
         _cts?.Cancel();
 
         if (_call != null) {
-            Log.Information("[Grpc] Closing the request stream...");
+            Log.Information("Closing the request stream...");
             await AwaitCancelled(() => _call.RequestStream.CompleteAsync());
         }
 
         if (_readTask != null) {
-            Log.Information("[Grpc] Closing the reader...");
+            Log.Information("Closing the reader...");
             await AwaitCancelled(() => _readTask);
         }
     }

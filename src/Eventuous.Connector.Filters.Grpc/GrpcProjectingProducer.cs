@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 using Eventuous.Producers;
 using Eventuous.Producers.Diagnostics;
 using Google.Protobuf;
@@ -15,11 +18,11 @@ public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOption
         _projectorsByName = new();
 
     protected void On<TEvent>(Func<ProjectedMessage<TEvent>, CancellationToken, Task> projector)
-        where TEvent : IMessage<TEvent>, new() {
+        where TEvent : class, IMessage<TEvent>, new() {
         var temp = new TEvent();
         _projectorsByName.Add(temp.Descriptor.FullName, ProjectAny);
 
-        TEvent GetEvent(Any message) {
+        static TEvent GetEvent(Any message) {
             var evt = new TEvent();
             evt.MergeFrom(message.Value);
             return evt;
@@ -39,7 +42,7 @@ public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOption
         CancellationToken            cancellationToken = default
     ) {
         var tasks = messages.Select(x => Project(x, stream, cancellationToken));
-        return tasks.WhenAll();
+        return Task.WhenAll(tasks);
     }
 
     async Task Project(ProducedMessage message, StreamName streamName, CancellationToken cancellationToken) {
@@ -54,11 +57,11 @@ public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOption
         }
 
         try {
-            await projector(response, streamName, cancellationToken).NoContext();
-            await message.Ack<T>().NoContext();
+            await projector(response, streamName, cancellationToken).ConfigureAwait(false);
+            await message.Ack<T>().ConfigureAwait(false);
         }
         catch (Exception e) {
-            await message.Nack<T>(e.Message, e).NoContext();
+            await message.Nack<T>(e.Message, e).ConfigureAwait(false);
         }
     }
 }
