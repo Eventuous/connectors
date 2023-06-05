@@ -46,7 +46,7 @@ public class GrpcCheckpointStore : ICheckpointStore {
             cancellationToken: cancellationToken
         );
 
-        _log.LogInformation("Received checkpoint {CheckpointId} at {Position}", checkpointId, response.Position);
+        _log.LogInformation("[{CheckpointId}] Received checkpoint at {Position}", checkpointId, response.Position);
 
         var position = response.CheckpointCase == GetCheckpointResponse.CheckpointOneofCase.None ? null : (ulong?)response.Position;
         return new Checkpoint(checkpointId, position);
@@ -65,7 +65,7 @@ public class GrpcCheckpointStore : ICheckpointStore {
             cancellationToken: cancellationToken
         );
 
-        _log.LogInformation("Stored checkpoint {CheckpointId} at {Position}", checkpoint.Id, checkpoint.Position ?? 0);
+        _log.LogInformation("[{CheckpointId}] Stored checkpoint at {Position}", checkpoint.Id, checkpoint.Position ?? 0);
 
         return checkpoint;
     }
