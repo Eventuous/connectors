@@ -29,15 +29,14 @@ public abstract class EsdbProjectorStartup<TConfig, TProjector, TProjectorOption
     where TProjector : class, IEventProducer<TProjectorOptions>
     where TProjectorOptions : class, new() {
     public ConnectorApp BuildConnectorApp(
-        string                                                        configFile,
-        ExporterMappings<TracerProviderBuilder>                       tracingExporters,
-        ExporterMappings<MeterProviderBuilder>                        metricsExporters
+        string                                  configFile,
+        ExporterMappings<TracerProviderBuilder> tracingExporters,
+        ExporterMappings<MeterProviderBuilder>  metricsExporters
     ) {
         var builder = ConnectorApp.Create<EsdbConfig, TConfig, GrpcProjectorSettings>(configFile);
 
-        builder
-            .RegisterDependencies(RegisterProject)
-            .RegisterConnector(ConfigureProjectConnector);
+        builder.RegisterDependencies(RegisterProject);
+        builder.RegisterConnector(ConfigureProjectConnector);
 
         builder.AddOpenTelemetry(
             (cfg, enrich) => {
@@ -55,7 +54,7 @@ public abstract class EsdbProjectorStartup<TConfig, TProjector, TProjectorOption
     protected abstract IGatewayTransform<TProjectorOptions> GetTransform(IServiceProvider serviceProvider);
 
     ConnectorBuilder<AllStreamSubscription, AllStreamSubscriptionOptions, TProjector, TProjectorOptions> ConfigureProjectConnector(
-        ConnectorBuilder                     builder,
+        ConnectorBuilder                                            builder,
         ConnectorConfig<EsdbConfig, TConfig, GrpcProjectorSettings> config
     ) {
         var serializer       = new RawDataDeserializer();
@@ -83,8 +82,6 @@ public abstract class EsdbProjectorStartup<TConfig, TProjector, TProjectorOption
     protected abstract IAsyncPolicy GetRetryPolicy(IServiceProvider serviceProvider, ConnectorConfig config);
 
     protected abstract void ConfigureSubscription(SubscriptionBuilder<AllStreamSubscription, AllStreamSubscriptionOptions> builder);
-
-    protected virtual string GetTarget(TConfig config) => "dummy";
 
     protected abstract void RegisterTarget(IServiceCollection services, TConfig config);
 

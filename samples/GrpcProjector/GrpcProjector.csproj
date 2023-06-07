@@ -1,18 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
-
+    <Target Name="Container" AfterTargets="MinVer">
+        <PropertyGroup>
+            <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+            <ContainerImageName>esc-platform-advocacy/adv-eu-west2/dddeu2023/projector</ContainerImageName>
+            <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
+            <ContainerRegistry>europe-west2-docker.pkg.dev</ContainerRegistry>
+            <ContainerImageTags>$(MinVerVersion);latest</ContainerImageTags>
+        </PropertyGroup>
+    </Target>
     <ItemGroup>
-        <Protobuf Include="Protos\server.proto" GrpcServices="Server" />
+        <PackageReference Include="MinVer" Version="4.3.0" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.NET.Build.Containers" Version="7.0.302"/>
     </ItemGroup>
-
     <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+        <Protobuf Include="Protos\server.proto" GrpcServices="Server"/>
     </ItemGroup>
-
+    <ItemGroup>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.49.0"/>
+    </ItemGroup>
 </Project>

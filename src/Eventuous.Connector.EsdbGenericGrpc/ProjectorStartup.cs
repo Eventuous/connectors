@@ -26,9 +26,8 @@ public class ProjectorStartup : IConnectorStartup {
     ) {
         var builder = ConnectorApp.Create<EsdbConfig, GrpcTargetConfig, NoFilter>(configFile);
 
-        builder
-            .RegisterDependencies(RegisterProject)
-            .RegisterConnector(ConfigureProjectConnector);
+        builder.RegisterDependencies(RegisterProject);
+        builder.RegisterConnector(ConfigureProjectConnector);
 
         builder.AddOpenTelemetry(
             (cfg, enrich) =>

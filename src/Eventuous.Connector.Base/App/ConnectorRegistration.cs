@@ -12,8 +12,7 @@ public static class ConnectorRegistration {
     public static IServiceCollection
         AddConnector<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>(
             this IServiceCollection services,
-            Func<ConnectorBuilder, ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>>
-                configure
+            Func<ConnectorBuilder, ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>> configure
         )
         where TSubscription : EventSubscription<TSubscriptionOptions>
         where TSubscriptionOptions : SubscriptionOptions

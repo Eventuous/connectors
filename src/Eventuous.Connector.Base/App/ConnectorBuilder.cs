@@ -23,53 +23,53 @@ public class ConnectorBuilder {
         => new(subscriptionId);
 }
 
-public class ConnectorBuilder<TSubscription, TSubscriptionOptions> : ConnectorBuilder
-    where TSubscription : EventSubscription<TSubscriptionOptions> where TSubscriptionOptions : SubscriptionOptions {
+public class ConnectorBuilder<TSub, TSubOptions> : ConnectorBuilder
+    where TSub : EventSubscription<TSubOptions> where TSubOptions : SubscriptionOptions {
     internal string SubscriptionId { get; }
 
     internal ConnectorBuilder(string subscriptionId) => SubscriptionId = subscriptionId;
 
     [PublicAPI]
-    public ConnectorBuilder<TSubscription, TSubscriptionOptions> ConfigureSubscriptionOptions(Action<TSubscriptionOptions> configureOptions) {
+    public ConnectorBuilder<TSub, TSubOptions> ConfigureSubscriptionOptions(Action<TSubOptions> configureOptions) {
         _configureOptions = configureOptions;
         return this;
     }
 
     [PublicAPI]
-    public ConnectorBuilder<TSubscription, TSubscriptionOptions> ConfigureSubscription(Action<SubscriptionBuilder<TSubscription, TSubscriptionOptions>> configure) {
+    public ConnectorBuilder<TSub, TSubOptions> ConfigureSubscription(Action<SubscriptionBuilder<TSub, TSubOptions>> configure) {
         _configure = configure;
         return this;
     }
 
     [PublicAPI]
-    public ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>
+    public ConnectorBuilder<TSub, TSubOptions, TProducer, TProduceOptions>
         ProduceWith<TProducer, TProduceOptions>(ResolveRetryPolicy? retryPolicy = null, bool awaitProduce = true)
         where TProducer : class, IEventProducer<TProduceOptions> where TProduceOptions : class
         => new(this, retryPolicy, awaitProduce);
 
-    internal void ConfigureOptions(TSubscriptionOptions options) => _configureOptions?.Invoke(options);
+    internal void ConfigureOptions(TSubOptions options) => _configureOptions?.Invoke(options);
 
-    internal void Configure(SubscriptionBuilder<TSubscription, TSubscriptionOptions> builder) => _configure?.Invoke(builder);
+    internal void Configure(SubscriptionBuilder<TSub, TSubOptions> builder) => _configure?.Invoke(builder);
 
-    Action<TSubscriptionOptions>?                                     _configureOptions;
-    Action<SubscriptionBuilder<TSubscription, TSubscriptionOptions>>? _configure;
+    Action<TSubOptions>?                                     _configureOptions;
+    Action<SubscriptionBuilder<TSub, TSubOptions>>? _configure;
 }
 
-public class ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>
-    where TSubscription : EventSubscription<TSubscriptionOptions>
-    where TSubscriptionOptions : SubscriptionOptions
+public class ConnectorBuilder<TSub, TSubOptions, TProducer, TProduceOptions>
+    where TSub : EventSubscription<TSubOptions>
+    where TSubOptions : SubscriptionOptions
     where TProducer : class, IEventProducer<TProduceOptions>
     where TProduceOptions : class {
-    readonly ConnectorBuilder<TSubscription, TSubscriptionOptions> _inner;
-    readonly ResolveRetryPolicy?                                   _resolveRetryPolicy;
-    Func<IServiceProvider, IGatewayTransform<TProduceOptions>>?    _getTransformer;
-    readonly bool                                                  _awaitProduce;
-    Type?                                                          _transformerType;
+    readonly ConnectorBuilder<TSub, TSubOptions>                _inner;
+    readonly ResolveRetryPolicy?                                _resolveRetryPolicy;
+    Func<IServiceProvider, IGatewayTransform<TProduceOptions>>? _getTransformer;
+    readonly bool                                               _awaitProduce;
+    Type?                                                       _transformerType;
 
     public ConnectorBuilder(
-        ConnectorBuilder<TSubscription, TSubscriptionOptions> inner,
-        ResolveRetryPolicy?                                   resolveRetryPolicy,
-        bool                                                  awaitProduce
+        ConnectorBuilder<TSub, TSubOptions> inner,
+        ResolveRetryPolicy?                 resolveRetryPolicy,
+        bool                                awaitProduce
     ) {
         _inner = inner;
         _resolveRetryPolicy = resolveRetryPolicy;
@@ -77,7 +77,7 @@ public class ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TP
     }
 
     [PublicAPI]
-    public ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions> TransformWith<T>(Func<IServiceProvider, T>? getTransformer)
+    public ConnectorBuilder<TSub, TSubOptions, TProducer, TProduceOptions> TransformWith<T>(Func<IServiceProvider, T>? getTransformer)
         where T : class, IGatewayTransform<TProduceOptions> {
         _getTransformer = getTransformer;
         _transformerType = typeof(T);
@@ -92,7 +92,7 @@ public class ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TP
 
         services.TryAddSingleton<TProducer>();
 
-        services.AddSubscription<TSubscription, TSubscriptionOptions>(
+        services.AddSubscription<TSub, TSubOptions>(
             _inner.SubscriptionId,
             builder => {
                 builder.Configure(_inner.ConfigureOptions);

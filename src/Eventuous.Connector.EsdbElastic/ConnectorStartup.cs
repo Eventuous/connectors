@@ -39,14 +39,12 @@ public class ConnectorStartup : IConnectorStartup {
         var builder = ConnectorApp.Create<EsdbConfig, ElasticConfig, GrpcProjectorSettings>(configFile);
 
         if (builder.Config.Target.ConnectorMode == "produce") {
-            builder
-                .RegisterDependencies(RegisterProduce<PersistedEvent>)
-                .RegisterConnector(ConfigureProduceConnector);
+            builder .RegisterDependencies(RegisterProduce<PersistedEvent>);
+                builder.RegisterConnector(ConfigureProduceConnector);
         }
         else {
-            builder
-                .RegisterDependencies(RegisterProject)
-                .RegisterConnector(ConfigureProjectConnector);
+            builder.RegisterDependencies(RegisterProject);
+                builder.RegisterConnector(ConfigureProjectConnector);
         }
 
         builder.AddOpenTelemetry(

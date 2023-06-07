@@ -38,7 +38,7 @@ public class ProjectorStartup : EsdbProjectorStartup<MongoConfig, MongoJsonProje
     protected override void ConfigureSubscription(SubscriptionBuilder<AllStreamSubscription, AllStreamSubscriptionOptions> builder)
         => builder.UseCheckpointStore<MongoCheckpointStore>();
 
-    protected override string GetTarget(MongoConfig config) => Ensure.NotEmptyString(config.Collection, "MongoDB collection");
+    protected virtual string GetTarget(MongoConfig config) => Ensure.NotEmptyString(config.Collection, "MongoDB collection");
 
     protected override void RegisterTarget(IServiceCollection services, MongoConfig config)
         => services.AddMongo(
