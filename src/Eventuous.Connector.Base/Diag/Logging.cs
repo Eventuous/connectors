@@ -39,10 +39,7 @@ public static class Logging {
 
         LoggerConfiguration DefaultSink(LoggerSinkConfiguration sinkConfig)
             => environment.IsDevelopment()
-                ? sinkConfig.Console(
-                    outputTemplate:
-                    "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}>;{NewLine}{Exception}"
-                )
+                ? sinkConfig.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}>;{NewLine}{Exception}")
                 : sinkConfig.Console(new RenderedCompactJsonFormatter());
     }
 

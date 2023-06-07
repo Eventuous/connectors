@@ -10,7 +10,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Grpc.Net.Client.Internal.GrpcCall", LogEventLevel.Error)
     .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", LogEventLevel.Warning)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}>;{NewLine}{Exception}")
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
