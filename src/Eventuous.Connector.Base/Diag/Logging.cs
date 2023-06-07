@@ -25,7 +25,7 @@ public static class Logging {
 
         var logConfig = new LoggerConfiguration()
             .MinimumLevel.Is(logLevel)
-            .MinimumLevel.Override("Eventuous", LogEventLevel.Verbose)
+            // .MinimumLevel.Override("Eventuous", LogEventLevel.Verbose)
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Grpc", LogEventLevel.Fatal)
             .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", LogEventLevel.Warning)
