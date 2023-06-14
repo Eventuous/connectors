@@ -30,8 +30,7 @@ public class ProjectorStartup : IConnectorStartup {
         builder.RegisterConnector(ConfigureProjectConnector);
 
         builder.AddOpenTelemetry(
-            (cfg, enrich) =>
-                cfg.AddGrpcClientInstrumentation(options => options.Enrich = enrich),
+            (cfg, enrich) => cfg.AddGrpcClientInstrumentation(options => options.Enrich = enrich),
             sampler: new AlwaysOnSampler(),
             tracingExporters: tracingExporters,
             metricsExporters: metricsExporters

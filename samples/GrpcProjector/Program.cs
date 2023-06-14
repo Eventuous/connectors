@@ -20,11 +20,7 @@ builder.Host.UseSerilog();
 
 builder.Services.AddGrpc();
 
-if (builder.Environment.IsDevelopment()) {
-    builder.WebHost.ConfigureKestrel(
-        options => options.ListenLocalhost(9091, o => o.Protocols = HttpProtocols.Http2)
-    );
-}
+if (builder.Environment.IsDevelopment()) { builder.WebHost.ConfigureKestrel(options => options.ListenLocalhost(9091, o => o.Protocols = HttpProtocols.Http2)); }
 
 var app = builder.Build();
 app.MapGrpcService<ProjectorService>();
@@ -34,12 +30,10 @@ try {
     var port = Environment.GetEnvironmentVariable("PORT");
     var url  = string.IsNullOrWhiteSpace(port) ? null : $"http://+:{port}";
     app.Run(url);
+
     return 0;
-}
-catch (Exception e) {
+} catch (Exception e) {
     Log.Fatal(e, "Host terminated unexpectedly");
+
     return 1;
-}
-finally {
-    Log.CloseAndFlush();
-}
+} finally { Log.CloseAndFlush(); }

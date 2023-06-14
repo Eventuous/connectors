@@ -1,10 +1,7 @@
 using System.Text;
-using System.Text.Json;
-using Eventuous.Connector.Base.Config;
 using Eventuous.Connector.EsdbGenericGrpc.Config;
 using Eventuous.Gateway;
 using Eventuous.Producers;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -19,18 +16,15 @@ public class GrpcJsonProjector : BaseProducer<GrpcJsonProjectOptions> {
     readonly ChannelCredentials         _creds;
 
     public GrpcJsonProjector(GrpcTargetConfig config, ILogger<GrpcJsonProjector> log) {
-        _log = log;
-        _host = config.GetHost();
+        _log   = log;
+        _host  = config.GetHost();
         _creds = config.GetCredentials();
     }
 
     GrpcChannel GetChannel()
         => GrpcChannel.ForAddress(
             _host,
-            new GrpcChannelOptions {
-                Credentials = _creds,
-                ServiceConfig = new ServiceConfig { MethodConfigs = { Defaults.DefaultMethodConfig } }
-            }
+            new GrpcChannelOptions { Credentials = _creds, ServiceConfig = new ServiceConfig { MethodConfigs = { Defaults.DefaultMethodConfig } } }
         );
 
     protected override async Task ProduceMessages(
@@ -47,26 +41,23 @@ public class GrpcJsonProjector : BaseProducer<GrpcJsonProjectOptions> {
         var request = new ProjectRequest();
         request.Events.AddRange(events.Where(x => x.Stream[0] != '$'));
 
-        _log.LogDebug("Projecting {Count} events to {Stream}", request.Events.Count, stream);
+        _log.LogTrace("Projecting {Count} events to {Stream}", request.Events.Count, stream);
         var _ = await client.ProjectAsync(request, cancellationToken: cancellationToken);
+
+        return;
 
         static ProjectedEvent AsProjectedEvent(ProducedMessage msg) {
             var json = Encoding.UTF8.GetString((msg.Message as byte[])!);
 
-            var pe = new ProjectedEvent {
-                EventId = msg.MessageId.ToString(),
-                EventPayload = Struct.Parser.ParseJson(json),
-            };
+            var pe = new ProjectedEvent { EventId = msg.MessageId.ToString(), EventPayload = Struct.Parser.ParseJson(json), };
 
-            if (msg.Metadata != null) {
-                pe.Metadata.Add(msg.Metadata.ToHeaders());
-            }
+            if (msg.Metadata != null) { pe.Metadata.Add(msg.Metadata.ToHeaders()); }
 
             if (msg.AdditionalHeaders != null) {
-                pe.Position = (long)(ulong)msg.AdditionalHeaders[GatewayContextItems.OriginalGlobalPosition]!;
+                pe.Position    = (long)(ulong)msg.AdditionalHeaders[GatewayContextItems.OriginalGlobalPosition]!;
                 pe.EventNumber = (int)(ulong)msg.AdditionalHeaders[GatewayContextItems.OriginalStreamPosition]!;
-                pe.Stream = ((StreamName)msg.AdditionalHeaders[GatewayContextItems.OriginalStream]!).ToString();
-                pe.EventType = (string)msg.AdditionalHeaders[GatewayContextItems.OriginalMessageType]!;
+                pe.Stream      = ((StreamName)msg.AdditionalHeaders[GatewayContextItems.OriginalStream]!).ToString();
+                pe.EventType   = (string)msg.AdditionalHeaders[GatewayContextItems.OriginalMessageType]!;
             }
 
             return pe;

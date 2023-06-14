@@ -65,7 +65,7 @@ public class GrpcCheckpointStore : ICheckpointStore {
             cancellationToken: cancellationToken
         );
 
-        _log.LogInformation("[{CheckpointId}] Stored checkpoint at {Position}", checkpoint.Id, checkpoint.Position ?? 0);
+        _log.LogDebug("[{CheckpointId}] Stored checkpoint at {Position}", checkpoint.Id, checkpoint.Position ?? 0);
 
         return checkpoint;
     }

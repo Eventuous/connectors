@@ -9,11 +9,13 @@ public class ProjectorService : Projection.ProjectionBase {
 
     public override Task<GetCheckpointResponse> GetCheckpoint(GetCheckpointRequest request, ServerCallContext context) {
         _logger.LogInformation("Loading checkpoint");
+
         return Task.FromResult(new GetCheckpointResponse { Position = 0 });
     }
 
     public override Task<StoreCheckpointResponse> StoreCheckpoint(StoreCheckpointRequest request, ServerCallContext context) {
         _logger.LogInformation("Storing checkpoint {Position}", request.Position);
+
         return Task.FromResult(new StoreCheckpointResponse());
     }
 
