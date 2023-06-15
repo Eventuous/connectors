@@ -24,8 +24,7 @@ jobs:
         name: Docker
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '8.0.x'
-          dotnet-quality: 'preview'
+          dotnet-version: '8.0.100-preview.4.23260.5'
       -
         name: Login to DockerHub
         uses: docker/login-action@v1
