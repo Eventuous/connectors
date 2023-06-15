@@ -7,9 +7,6 @@ on:
     paths-ignore:
       - '**.md'
       - '**.yaml'
-  pull_request:
-    branches:
-      - 'main'
 
 jobs:
   docker-x64:
@@ -57,7 +54,6 @@ jobs:
           cd src/Eventuous.Connector
           dotnet publish --runtime linux-arm64 -p:PublishProfile=DefaultContainer -c Release --self-contained
   docker-combined:
-    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     needs:
       - docker-x64
