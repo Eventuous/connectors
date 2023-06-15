@@ -2,8 +2,6 @@ name: "Build and push Docker"
 
 on:
   push:
-    branches:
-      - '**'
     tags:
       - '*.*.*'
     paths-ignore:

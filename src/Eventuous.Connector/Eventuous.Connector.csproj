@@ -16,6 +16,7 @@
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OtelVersion)"/>
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="$(OtelVersion)"/>
         <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="$(OtelVersion)"/>
+        <PackageReference Include="Microsoft.NET.Build.Containers" Version="7.0.302"/>
     </ItemGroup>
 
     <ItemGroup>
