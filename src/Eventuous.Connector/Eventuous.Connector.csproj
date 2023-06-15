@@ -3,22 +3,30 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
+    <Target Name="Container" AfterTargets="MinVer">
+        <PropertyGroup>
+            <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+            <ContainerImageName>esc-platform-advocacy/adv-eu-west2/linearsync/linearsync</ContainerImageName>
+            <ContainerImageTags>$(MinVerVersion);latest</ContainerImageTags>
+        </PropertyGroup>
+    </Target>
+
     <ItemGroup>
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OtelVersion)" />
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OtelVersion)" />
-        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="$(OtelVersion)" />
-        <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="$(OtelVersion)" />
+        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OtelVersion)"/>
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OtelVersion)"/>
+        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="$(OtelVersion)"/>
+        <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="$(OtelVersion)"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
-        <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj" />
-        <ProjectReference Include="..\Eventuous.Connector.EsdbGenericGrpc\Eventuous.Connector.EsdbGenericGrpc.csproj" />
-        <ProjectReference Include="..\Eventuous.Connector.EsdbMongo\Eventuous.Connector.EsdbMongo.csproj" />
-        <ProjectReference Include="..\Eventuous.Connector.EsdbSqlServer\Eventuous.Connector.EsdbSqlServer.csproj" />
+        <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj"/>
+        <ProjectReference Include="..\Eventuous.Connector.EsdbElastic\Eventuous.Connector.EsdbElastic.csproj"/>
+        <ProjectReference Include="..\Eventuous.Connector.EsdbGenericGrpc\Eventuous.Connector.EsdbGenericGrpc.csproj"/>
+        <ProjectReference Include="..\Eventuous.Connector.EsdbMongo\Eventuous.Connector.EsdbMongo.csproj"/>
+        <ProjectReference Include="..\Eventuous.Connector.EsdbSqlServer\Eventuous.Connector.EsdbSqlServer.csproj"/>
     </ItemGroup>
 
     <ItemGroup Condition="$(Configuration) == 'Debug'">
-        <None Update="config.yaml" CopyToOutputDirectory="Always" CopyToPublishDirectory="Never" />
+        <None Update="config.yaml" CopyToOutputDirectory="Always" CopyToPublishDirectory="Never"/>
     </ItemGroup>
 </Project>
