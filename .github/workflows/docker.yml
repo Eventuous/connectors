@@ -32,6 +32,10 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       - name: Create and push Docker container
         run: |
+          dotnet tool install --global minver-cli
           cd src/Eventuous.Connector
           dotnet publish --runtime linux-x64 -p:PublishProfile=DefaultContainer -c Release --self-contained
           dotnet publish --runtime linux-arm64 -p:PublishProfile=DefaultContainer -c Release --self-contained
+          export VERSION=$(minver)
+          docker manifest create eventuous/connector:${VERSION} eventuous/connector:linux-x64-${VERSION} eventuous/connector:linux-arm64-${VERSION}
+          docker manifest push eventuous/connector:${VERSION}

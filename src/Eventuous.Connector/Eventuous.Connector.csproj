@@ -7,7 +7,7 @@
         <PropertyGroup>
             <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
             <ContainerImageName>eventuous/connector</ContainerImageName>
-            <ContainerImageTags>$(MinVerVersion);latest</ContainerImageTags>
+            <ContainerImageTags>$(RuntimeIdentifier)-$(MinVerVersion);$(RuntimeIdentifier)-latest</ContainerImageTags>
             <ContainerRegistry>registry.hub.docker.com</ContainerRegistry>
         </PropertyGroup>
     </Target>
