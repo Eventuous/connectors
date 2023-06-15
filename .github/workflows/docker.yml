@@ -17,10 +17,10 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       -
-        name: Docker
-        uses: actions/setup-dotnet@v1
+        name: Set up .NET
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.100-preview.4.23260.5'
       -
@@ -39,10 +39,10 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       -
-        name: Docker
-        uses: actions/setup-dotnet@v1
+        name: Set up .NET
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.100-preview.4.23260.5'
       -
@@ -57,19 +57,12 @@ jobs:
           cd src/Eventuous.Connector
           dotnet publish --runtime linux-arm64 -p:PublishProfile=DefaultContainer -c Release --self-contained
   docker-combined:
+    if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     needs:
       - docker-x64
       - docker-arm64
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v1
-      -
-        name: Docker
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '8.0.100-preview.4.23260.5'
       -
         name: Login to DockerHub
         uses: docker/login-action@v2
@@ -77,9 +70,10 @@ jobs:
           registry: registry-1.docker.io
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
-      - name: Create and push Docker container
-        run: |
-          dotnet tool install --global minver-cli
-          export VERSION=$(minver)
-          docker manifest create eventuous/connector:${VERSION} eventuous/connector:linux-x64-${VERSION} eventuous/connector:linux-arm64-${VERSION}
-          docker manifest push eventuous/connector:${VERSION}
+      -
+        name: Create and push manifest images
+        uses: Noelware/docker-manifest-action@master
+        with:
+          inputs: eventuous/connector:latest
+          images: eventuous/connector:linux-x64-latest,eventuous/connector:linux-arm64-latest
+          push: true
