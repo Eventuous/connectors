@@ -8,7 +8,7 @@
             <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
             <ContainerImageName>eventuous/connector</ContainerImageName>
             <ContainerImageTags>$(MinVerVersion);latest</ContainerImageTags>
-            <ContainerRegistry>hub.docker.com</ContainerRegistry>
+            <ContainerRegistry>registry.hub.docker.com</ContainerRegistry>
         </PropertyGroup>
     </Target>
 
