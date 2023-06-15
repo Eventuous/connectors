@@ -1,12 +1,14 @@
 <Project>
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <EventuousVersion>0.14.1-alpha.0.31</EventuousVersion>
         <OtelVersion>1.5.0-rc.1</OtelVersion>
         <OtelExtensionsVersion>1.0.0-rc9.6</OtelExtensionsVersion>
         <RepoRoot>$([System.IO.Directory]::GetParent($(MSBuildThisFileDirectory)).Parent.FullName)</RepoRoot>
+        <NoWarn>CS8981</NoWarn>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(IsTestProject)' != 'true'">

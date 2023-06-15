@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 // ReSharper disable once CheckNamespace
 namespace Eventuous.Connector.Tools;
 
-public static class Ensure {
+static class Ensure {
     [DebuggerHidden]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T NotNull<T>(T? value, [CallerArgumentExpression("value")] string? name = default) where T : class
