@@ -6,8 +6,9 @@
     <Target Name="Container" AfterTargets="MinVer">
         <PropertyGroup>
             <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-            <ContainerImageName>esc-platform-advocacy/adv-eu-west2/linearsync/linearsync</ContainerImageName>
+            <ContainerImageName>eventuous/connector</ContainerImageName>
             <ContainerImageTags>$(MinVerVersion);latest</ContainerImageTags>
+            <ContainerRegistry>hub.docker.com</ContainerRegistry>
         </PropertyGroup>
     </Target>
 
