@@ -33,5 +33,6 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       - name: Create and push Docker container
         run: |
+          cd src/Eventuous.Connector
           dotnet publish --runtime linux-x64 -p:PublishProfile=DefaultContainer -c Release --self-contained
           dotnet publish --runtime linux-arm64 -p:PublishProfile=DefaultContainer -c Release --self-contained

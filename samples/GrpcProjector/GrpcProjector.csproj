@@ -8,9 +8,7 @@
     <Target Name="Container" AfterTargets="MinVer">
         <PropertyGroup>
             <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-            <ContainerImageName>esc-platform-advocacy/adv-eu-west2/dddeu2023/projector</ContainerImageName>
             <ContainerRuntimeIdentifier>linux-x64</ContainerRuntimeIdentifier>
-            <ContainerRegistry>europe-west2-docker.pkg.dev</ContainerRegistry>
             <ContainerImageTags>$(MinVerVersion);latest</ContainerImageTags>
         </PropertyGroup>
     </Target>
