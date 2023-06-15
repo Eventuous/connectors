@@ -17,6 +17,6 @@ target:
   connectorMode: "project"
   dataStream:
     indexName: "test"
-grpc:
+filter:
   uri: "http://localhost:9091"
   credentials: "insecure"

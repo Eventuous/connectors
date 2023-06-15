@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 using Eventuous.Connector.EsdbElastic.Conversions;
 using Eventuous.ElasticSearch.Producers;
 using Eventuous.ElasticSearch.Store;

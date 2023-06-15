@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -22,6 +25,7 @@ public static class Logging {
 
         var logConfig = new LoggerConfiguration()
             .MinimumLevel.Is(logLevel)
+            // .MinimumLevel.Override("Eventuous", LogEventLevel.Verbose)
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Grpc", LogEventLevel.Fatal)
             .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", LogEventLevel.Warning)
@@ -35,10 +39,7 @@ public static class Logging {
 
         LoggerConfiguration DefaultSink(LoggerSinkConfiguration sinkConfig)
             => environment.IsDevelopment()
-                ? sinkConfig.Console(
-                    outputTemplate:
-                    "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}>;{NewLine}{Exception}"
-                )
+                ? sinkConfig.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} <s:{SourceContext}>;{NewLine}{Exception}")
                 : sinkConfig.Console(new RenderedCompactJsonFormatter());
     }
 

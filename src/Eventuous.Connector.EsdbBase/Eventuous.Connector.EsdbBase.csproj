@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
+        <ProjectReference Include="..\Eventuous.Connector.Filters.Grpc\Eventuous.Connector.Filters.Grpc.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
+        <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="$(OtelExtensionsVersion)" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\Eventuous.Connector.Base\Tools\Ensure.cs">
+            <Link>Tools\Ensure.cs</Link>
+        </Compile>
+    </ItemGroup>
+</Project>

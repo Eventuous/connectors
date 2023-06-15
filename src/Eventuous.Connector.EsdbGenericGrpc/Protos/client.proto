@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package grpc_projection;
+option csharp_namespace = "Eventuous.Connector.EsdbGenericGrpc";
+import "google/protobuf/struct.proto";
+
+service Projection {
+  rpc Project (ProjectRequest) returns (ProjectResponse);
+  rpc GetCheckpoint (GetCheckpointRequest) returns (GetCheckpointResponse);
+  rpc StoreCheckpoint (StoreCheckpointRequest) returns (StoreCheckpointResponse);
+}
+
+message ProjectedEvent {
+  string eventType = 1;
+  string eventId = 2;
+  string stream = 3;
+  int32 eventNumber = 4;
+  int64 position = 5;
+  google.protobuf.Struct eventPayload = 6;
+  map<string, string> metadata = 7;
+}
+
+message ProjectRequest {
+  repeated ProjectedEvent events = 1;
+}
+
+message ProjectResponse {
+}
+
+message GetCheckpointRequest {
+  string checkpointId = 1;
+}
+
+message GetCheckpointResponse {
+  oneof checkpoint {
+    int64 position = 1;
+  }
+}
+
+message StoreCheckpointRequest {
+  string checkpointId = 1;
+  int64 position = 2;
+}
+
+message StoreCheckpointResponse {
+}

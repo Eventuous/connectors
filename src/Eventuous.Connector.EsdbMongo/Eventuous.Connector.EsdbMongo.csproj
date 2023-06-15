@@ -15,5 +15,12 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />
+        <ProjectReference Include="..\Eventuous.Connector.EsdbBase\Eventuous.Connector.EsdbBase.csproj" />
+        <ProjectReference Include="..\Eventuous.Connector.Filters.Grpc\Eventuous.Connector.Filters.Grpc.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\Eventuous.Connector.Base\Tools\Ensure.cs">
+            <Link>Tools\Ensure.cs</Link>
+        </Compile>
     </ItemGroup>
 </Project>

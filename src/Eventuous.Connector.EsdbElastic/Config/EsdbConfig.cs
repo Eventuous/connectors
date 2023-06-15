@@ -1,3 +1,4 @@
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 namespace Eventuous.Connector.EsdbElastic.Config;
 
 public record EsdbConfig {

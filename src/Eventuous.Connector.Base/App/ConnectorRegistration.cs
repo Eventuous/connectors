@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 // ReSharper disable CheckNamespace
 
 using Eventuous.Producers;
@@ -9,8 +12,7 @@ public static class ConnectorRegistration {
     public static IServiceCollection
         AddConnector<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>(
             this IServiceCollection services,
-            Func<ConnectorBuilder, ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>>
-                configure
+            Func<ConnectorBuilder, ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>> configure
         )
         where TSubscription : EventSubscription<TSubscriptionOptions>
         where TSubscriptionOptions : SubscriptionOptions

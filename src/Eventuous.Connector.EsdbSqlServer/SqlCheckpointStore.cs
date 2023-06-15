@@ -1,3 +1,6 @@
+// Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
+// Licensed under the Apache License, Version 2.0.
+
 using System.Data;
 using System.Data.Common;
 using Eventuous.Subscriptions.Checkpoints;
@@ -6,10 +9,13 @@ using Microsoft.Extensions.Logging;
 namespace Eventuous.Connector.EsdbSqlServer;
 
 public class SqlCheckpointStore : ICheckpointStore {
+    const string TableName = "Checkpoints";
+
+    const    string                      CreateTableSql      = @$"CREATE TABLE {TableName} (ID VARCHAR(100) NOT NULL PRIMARY KEY, Position BIGINT)";
+    const    string                      InsertCheckpointSql = @$"INSERT INTO {TableName} (ID, Position) VALUES (@CheckpointId, @Position)";
+    const    string                      UpdateCheckpointSql = @$"UPDATE {TableName} SET Position = @Position WHERE ID = @CheckpointId";
     readonly GetConnection               _getConnection;
     readonly ILogger<SqlCheckpointStore> _log;
-
-    const string TableName = "Checkpoints";
 
     public SqlCheckpointStore(GetConnection getConnection, ILogger<SqlCheckpointStore> log) {
         _getConnection = getConnection;
@@ -76,24 +82,19 @@ public class SqlCheckpointStore : ICheckpointStore {
         return checkpoint;
     }
 
-    const string CreateTableSql = @$"CREATE TABLE {TableName} (ID VARCHAR(100) NOT NULL PRIMARY KEY, Position BIGINT)";
-    const string InsertCheckpointSql = @$"INSERT INTO {TableName} (ID, Position) VALUES (@CheckpointId, @Position)";
-    const string UpdateCheckpointSql = @$"UPDATE {TableName} SET Position = @Position WHERE ID = @CheckpointId";
-
     async Task EnsureTableExists(CancellationToken cancellationToken) {
         if (await Exists()) return;
 
         _log.LogInformation("Creating the checkpoints table");
         await CreateTable();
 
+        return;
+
         async Task<bool> Exists() {
             await using var connection = await _getConnection(cancellationToken);
             await using var command    = connection.CreateCommand();
             command.CommandType = CommandType.Text;
-
-            command.CommandText =
-                "IF EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME=@table) SELECT 1 ELSE SELECT 0";
-
+            command.CommandText = "IF EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME=@table) SELECT 1 ELSE SELECT 0";
             command.AddParameter("@table", TableName);
             var exists = (int)(await command.ExecuteScalarAsync(cancellationToken))!;
 
@@ -114,9 +115,9 @@ public static class DbCommandExtensionMethods {
 
     public static async Task ExecuteNonQuery(
         this GetConnection getConnection,
-        string             query,
-        Action<DbCommand>  configureCommand,
-        CancellationToken  cancellationToken
+        string query,
+        Action<DbCommand> configureCommand,
+        CancellationToken cancellationToken
     ) {
         await using var connection = await getConnection(cancellationToken);
         await using var command    = connection.CreateCommand();
