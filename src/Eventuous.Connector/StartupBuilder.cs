@@ -93,13 +93,6 @@ sealed class StartupBuilder {
 
         Log.Information("Starting connector application");
 
-        try {
-            return await _app.Run();
-        }
-        catch (Exception e) {
-            Log.Fatal(e, "Connector application failed");
-            await Serilog.Log.CloseAndFlushAsync();
-            return -1;
-        }
+        return await _app.Run();
     }
 }

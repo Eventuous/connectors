@@ -61,10 +61,9 @@ csharp_place_expr_accessor_on_single_line = if_owner_is_single_line
 csharp_wrap_before_arrow_with_expressions = true
 csharp_wrap_before_first_type_parameter_constraint = true
 csharp_wrap_multiple_type_parameter_constraints_style = chop_if_long
-csharp_wrap_before_type_parameter_langle = true
 csharp_wrap_before_extends_colon = true
 csharp_wrap_extends_list_style = chop_if_long
-csharp_keep_existing_arrangement = false
+csharp_keep_existing_arrangement = true
 csharp_place_simple_blocks_on_single_line = true
 csharp_place_simple_method_on_single_line = false
 csharp_max_enum_members_on_line = 0
@@ -82,3 +81,8 @@ resharper_nested_ternary_style = expanded
 resharper_outdent_binary_ops = true
 
 file_header_template = Copyright (C) Ubiquitous AS.All rights reserved\nLicensed under the Apache License, Version 2.0.
+
+# ReSharper properties
+resharper_csharp_indent_method_decl_pars = inside
+resharper_csharp_wrap_multiple_type_parameter_constraints_style = chop_always
+resharper_instance_members_qualify_declared_in = base_class

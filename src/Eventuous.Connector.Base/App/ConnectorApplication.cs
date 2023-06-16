@@ -26,11 +26,8 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
     where TFilterConfig : class {
     public delegate void ResolveDependencies(IServiceCollection services, ConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig> config);
 
-    public delegate ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>
-        ConfigureConnector<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>(
-            ConnectorBuilder                                             builder,
-            ConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig> config
-        )
+    public delegate ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions> ConfigureConnector<TSubscription, TSubscriptionOptions,
+        TProducer, TProduceOptions>(ConnectorBuilder builder, ConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig> config)
         where TSubscription : EventSubscription<TSubscriptionOptions>
         where TSubscriptionOptions : SubscriptionOptions
         where TProducer : class, IEventProducer<TProduceOptions>
@@ -47,9 +44,7 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
         Builder.Services.AddSingleton(Config.Source);
         Builder.Services.AddSingleton(Config.Target);
 
-        if (!Config.Connector.Diagnostics.Enabled) {
-            Environment.SetEnvironmentVariable("EVENTUOUS_DISABLE_DIAGS", "1");
-        }
+        if (!Config.Connector.Diagnostics.Enabled) { Environment.SetEnvironmentVariable("EVENTUOUS_DISABLE_DIAGS", "1"); }
     }
 
     [PublicAPI]
@@ -64,9 +59,9 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
         Func<LoggerSinkConfiguration, LoggerConfiguration>? sinkConfiguration = null,
         Func<LoggerConfiguration, LoggerConfiguration>?     configureLogger   = null
     ) {
-        _minimumLogLevel = minimumLogLevel;
+        _minimumLogLevel   = minimumLogLevel;
         _sinkConfiguration = sinkConfiguration;
-        _configureLogger = configureLogger;
+        _configureLogger   = configureLogger;
     }
 
     [PublicAPI]
@@ -100,29 +95,25 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
     ) {
         _otelAdded = true;
 
-        if (!Config.Connector.Diagnostics.Enabled) {
-            return;
-        }
+        if (!Config.Connector.Diagnostics.Enabled) { return; }
 
         EventuousDiagnostics.AddDefaultTag(ConnectorIdTag, Config.Connector.ConnectorId);
 
         var otelBuilder = Builder.Services.AddOpenTelemetry();
 
         if (Config.Connector.Diagnostics.Tracing is { Enabled: true }) {
-            otelBuilder
-                .WithTracing(
-                    cfg => {
-                        cfg.AddEventuousTracing();
+            otelBuilder.WithTracing(
+                cfg => {
+                    cfg.AddEventuousTracing();
 
-                        configureTracing?.Invoke(cfg, EnrichActivity);
+                    configureTracing?.Invoke(cfg, EnrichActivity);
 
-                        cfg
-                            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Config.Connector.ServiceName))
-                            .SetSampler(sampler ?? new TraceIdRatioBasedSampler(Config.Connector.Diagnostics.TraceSamplerProbability));
+                    cfg.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Config.Connector.ServiceName))
+                        .SetSampler(sampler ?? new TraceIdRatioBasedSampler(Config.Connector.Diagnostics.TraceSamplerProbability));
 
-                        tracingExporters?.RegisterExporters(cfg, Config.Connector.Diagnostics.Tracing.Exporters);
-                    }
-                );
+                    tracingExporters?.RegisterExporters(cfg, Config.Connector.Diagnostics.Tracing.Exporters);
+                }
+            );
         }
 
         if (Config.Connector.Diagnostics.Metrics is { Enabled: true }) {
@@ -140,23 +131,24 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
     public ConnectorApp Build() {
         Builder.ConfigureSerilog(_minimumLogLevel, _sinkConfiguration, _configureLogger);
 
-        Builder.Services
-            .AddHealthChecks()
-            .AddSubscriptionsHealthCheck("Subscriptions", HealthStatus.Unhealthy, new[] { Config.Connector.ConnectorId });
+        Builder.Services.AddHealthChecks().AddSubscriptionsHealthCheck("Subscriptions", HealthStatus.Unhealthy, new[] { Config.Connector.ConnectorId });
 
-        if (!_otelAdded) {
-            AddOpenTelemetry();
-        }
+        if (!_otelAdded) { AddOpenTelemetry(); }
 
         var app = Builder.Build();
+
         return new ConnectorApp(app);
     }
 }
 
 public class ConnectorApp {
     [PublicAPI]
-    public static ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterConfig> Create<TSourceConfig, TTargetConfig, TFilterConfig>(string configFile)
-        where TSourceConfig : class where TTargetConfig : class where TFilterConfig : class
+    public static ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterConfig> Create<TSourceConfig, TTargetConfig, TFilterConfig>(
+        string configFile
+    )
+        where TSourceConfig : class
+        where TTargetConfig : class
+        where TFilterConfig : class
         => new(configFile);
 
     public WebApplication Host { get; }
@@ -166,23 +158,26 @@ public class ConnectorApp {
     public async Task<int> Run() {
         try {
             await Host.RunConnector();
+
             return 0;
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Log.Fatal(ex, "Host terminated unexpectedly");
+
             return -1;
-        }
-        finally {
-            await Log.CloseAndFlushAsync();
-        }
+        } finally { await Log.CloseAndFlushAsync(); }
     }
 }
 
 public static class ConnectorBuilderExtensions {
     [PublicAPI]
-    public static Task RunConnector<TSourceConfig, TTargetConfig, TFilterConfig>(this ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterConfig> builder)
-        where TSourceConfig : class where TTargetConfig : class where TFilterConfig : class {
+    public static Task RunConnector<TSourceConfig, TTargetConfig, TFilterConfig>(
+        this ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterConfig> builder
+    )
+        where TSourceConfig : class
+        where TTargetConfig : class
+        where TFilterConfig : class {
         var application = builder.Build();
+
         return application.Run();
     }
 }
