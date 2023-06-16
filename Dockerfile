@@ -7,7 +7,7 @@ WORKDIR /app
 
 ARG RUNTIME
 
-COPY ./src/Directory.Build.props ./src/*/*.csproj ./src/
+COPY ./src/Directory.Build.props ./src/*/*.csproj ./NuGet.config ./src/
 RUN for file in $(ls src/*.csproj); do mkdir -p ./${file%.*}/ && mv $file ./${file%.*}/; done
 RUN dotnet restore ./src/Eventuous.Connector -nowarn:msb3202,nu1503 -a $TARGETARCH
 
