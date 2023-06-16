@@ -3,21 +3,11 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
-    <Target Name="Container" AfterTargets="MinVer">
-        <PropertyGroup>
-            <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-            <ContainerImageName>eventuous/connector</ContainerImageName>
-            <ContainerImageTags>$(RuntimeIdentifier)-$(MinVerVersion);$(RuntimeIdentifier)-latest</ContainerImageTags>
-            <ContainerRegistry>registry-1.docker.io</ContainerRegistry>
-        </PropertyGroup>
-    </Target>
-
     <ItemGroup>
         <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OtelVersion)"/>
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OtelVersion)"/>
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="$(OtelVersion)"/>
         <PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="$(OtelVersion)"/>
-        <PackageReference Include="Microsoft.NET.Build.Containers" Version="7.0.302"/>
     </ItemGroup>
 
     <ItemGroup>
