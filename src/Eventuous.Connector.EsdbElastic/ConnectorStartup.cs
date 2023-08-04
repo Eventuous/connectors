@@ -39,18 +39,18 @@ public class ConnectorStartup : IConnectorStartup {
         var builder = ConnectorApp.Create<EsdbConfig, ElasticConfig, GrpcProjectorSettings>(configFile);
 
         if (builder.Config.Target.ConnectorMode == "produce") {
-            builder .RegisterDependencies(RegisterProduce<PersistedEvent>);
-                builder.RegisterConnector(ConfigureProduceConnector);
+            builder.RegisterDependencies(RegisterProduce<PersistedEvent>);
+            builder.RegisterConnector(ConfigureProduceConnector);
         }
         else {
             builder.RegisterDependencies(RegisterProject);
-                builder.RegisterConnector(ConfigureProjectConnector);
+            builder.RegisterConnector(ConfigureProjectConnector);
         }
 
         builder.AddOpenTelemetry(
             (cfg, enrich) =>
                 cfg
-                    .AddGrpcClientInstrumentation(options => options.Enrich = enrich)
+                    .AddGrpcClientInstrumentation(options => options.Enrich          = enrich)
                     .AddElasticsearchClientInstrumentation(options => options.Enrich = enrich),
             sampler: new AlwaysOnSampler(),
             tracingExporters: tracingExporters,
@@ -86,7 +86,8 @@ public class ConnectorStartup : IConnectorStartup {
 
     static ConnectorBuilder<AllStreamSubscription, AllStreamSubscriptionOptions, ElasticProducer, ElasticProduceOptions> ConfigureProduceConnector(
         ConnectorBuilder                                                  cfg,
-        ConnectorConfig<EsdbConfig, ElasticConfig, GrpcProjectorSettings> config
+        ConnectorConfig<EsdbConfig, ElasticConfig, GrpcProjectorSettings> config,
+        IHealthChecksBuilder                                              healthChecks
     ) {
         var indexName    = NotEmptyString(config.Target.DataStream?.IndexName);
         var getTransform = (IServiceProvider _) => new DefaultElasticTransform(indexName);
@@ -99,7 +100,8 @@ public class ConnectorStartup : IConnectorStartup {
 
     static ConnectorBuilder<AllStreamSubscription, AllStreamSubscriptionOptions, ElasticJsonProjector, ElasticJsonProjectOptions> ConfigureProjectConnector(
         ConnectorBuilder                                                  cfg,
-        ConnectorConfig<EsdbConfig, ElasticConfig, GrpcProjectorSettings> config
+        ConnectorConfig<EsdbConfig, ElasticConfig, GrpcProjectorSettings> config,
+        IHealthChecksBuilder                                              healthChecks
     ) {
         var indexName = NotEmptyString(config.Target.DataStream?.IndexName);
 
@@ -109,7 +111,7 @@ public class ConnectorStartup : IConnectorStartup {
                 sp.GetRequiredService<ILogger<GrpcTransform<ElasticJsonProjectOptions>>>()
             );
 
-        var builder = AddSubscription(cfg, config, b => b.AddGrpcProjector(NotNull(config.Filter)));
+        var builder = AddSubscription(cfg, config, b => b.AddGrpcProjector(NotNull(config.Filter), healthChecks));
 
         return builder
             .ProduceWith<ElasticJsonProjector, ElasticJsonProjectOptions>()

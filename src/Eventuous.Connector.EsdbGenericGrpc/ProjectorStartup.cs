@@ -44,7 +44,8 @@ public class ProjectorStartup : IConnectorStartup {
 
     static ConnectorBuilder<AllStreamSubscription, AllStreamSubscriptionOptions, GrpcJsonProjector, GrpcJsonProjectOptions> ConfigureProjectConnector(
         ConnectorBuilder                                        cfg,
-        ConnectorConfig<EsdbConfig, GrpcTargetConfig, NoFilter> config
+        ConnectorConfig<EsdbConfig, GrpcTargetConfig, NoFilter> config,
+        IHealthChecksBuilder                                    healthChecks
     ) {
         var serializer       = new PassThroughSerializer();
         var concurrencyLimit = config.Source.ConcurrencyLimit;

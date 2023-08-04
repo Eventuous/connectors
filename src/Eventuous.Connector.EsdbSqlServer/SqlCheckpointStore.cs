@@ -8,43 +8,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Eventuous.Connector.EsdbSqlServer;
 
-public class SqlCheckpointStore : ICheckpointStore {
+public class SqlCheckpointStore(GetConnection getConnection, ILogger<SqlCheckpointStore> log) : ICheckpointStore {
     const string TableName = "Checkpoints";
 
-    const    string                      CreateTableSql      = @$"CREATE TABLE {TableName} (ID VARCHAR(100) NOT NULL PRIMARY KEY, Position BIGINT)";
-    const    string                      InsertCheckpointSql = @$"INSERT INTO {TableName} (ID, Position) VALUES (@CheckpointId, @Position)";
-    const    string                      UpdateCheckpointSql = @$"UPDATE {TableName} SET Position = @Position WHERE ID = @CheckpointId";
-    readonly GetConnection               _getConnection;
-    readonly ILogger<SqlCheckpointStore> _log;
-
-    public SqlCheckpointStore(GetConnection getConnection, ILogger<SqlCheckpointStore> log) {
-        _getConnection = getConnection;
-        _log           = log;
-    }
+    const string CreateTableSql      = $"CREATE TABLE {TableName} (ID VARCHAR(100) NOT NULL PRIMARY KEY, Position BIGINT)";
+    const string InsertCheckpointSql = $"INSERT INTO {TableName} (ID, Position) VALUES (@CheckpointId, @Position)";
+    const string UpdateCheckpointSql = $"UPDATE {TableName} SET Position = @Position WHERE ID = @CheckpointId";
 
     public async ValueTask<Checkpoint> GetLastCheckpoint(string checkpointId, CancellationToken cancellationToken) {
         await EnsureTableExists(cancellationToken);
 
-        async Task<Checkpoint> GetCheckpoint(DbCommand cmd, CancellationToken ct) {
-            var cp = await cmd.ExecuteReaderAsync(ct);
-
-            if (!await cp.ReadAsync(ct)) {
-                await AddCheckpoint();
-                return new Checkpoint(checkpointId, null);
-            }
-
-            var value = cp.GetInt64(0);
-            return new Checkpoint(checkpointId, value == -1 ? null : (ulong?)value);
-        }
-
-        var checkpoint = await _getConnection.ExecuteQuery(
+        var checkpoint = await getConnection.ExecuteQuery(
             $"SELECT Position FROM {TableName} WHERE ID = @CheckpointId",
             cmd => cmd.AddParameter("@CheckpointId", checkpointId),
             GetCheckpoint,
             cancellationToken
         );
 
-        _log.LogInformation(
+        log.LogInformation(
             "Loaded checkpoint {CheckpointId} with value {Position}",
             checkpointId,
             checkpoint.Position
@@ -52,8 +33,22 @@ public class SqlCheckpointStore : ICheckpointStore {
 
         return checkpoint;
 
+        async Task<Checkpoint> GetCheckpoint(DbCommand cmd, CancellationToken ct) {
+            var cp = await cmd.ExecuteReaderAsync(ct);
+
+            if (!await cp.ReadAsync(ct)) {
+                await AddCheckpoint();
+
+                return new Checkpoint(checkpointId, null);
+            }
+
+            var value = cp.GetInt64(0);
+
+            return new Checkpoint(checkpointId, value == -1 ? null : (ulong?)value);
+        }
+
         Task AddCheckpoint()
-            => _getConnection.ExecuteNonQuery(
+            => getConnection.ExecuteNonQuery(
                 InsertCheckpointSql,
                 cmd => {
                     cmd.AddParameter("@CheckpointId", checkpointId);
@@ -68,7 +63,7 @@ public class SqlCheckpointStore : ICheckpointStore {
         bool              force,
         CancellationToken cancellationToken
     ) {
-        await _getConnection.ExecuteNonQuery(
+        await getConnection.ExecuteNonQuery(
             UpdateCheckpointSql,
             cmd => {
                 cmd.AddParameter("@CheckpointId", checkpoint.Id);
@@ -76,8 +71,8 @@ public class SqlCheckpointStore : ICheckpointStore {
             },
             cancellationToken
         );
-        
-        _log.LogDebug("Stored checkpoint {CheckpointId} with value {Position}", checkpoint.Id, checkpoint.Position);
+
+        log.LogDebug("Stored checkpoint {CheckpointId} with value {Position}", checkpoint.Id, checkpoint.Position);
 
         return checkpoint;
     }
@@ -85,13 +80,13 @@ public class SqlCheckpointStore : ICheckpointStore {
     async Task EnsureTableExists(CancellationToken cancellationToken) {
         if (await Exists()) return;
 
-        _log.LogInformation("Creating the checkpoints table");
+        log.LogInformation("Creating the checkpoints table");
         await CreateTable();
 
         return;
 
         async Task<bool> Exists() {
-            await using var connection = await _getConnection(cancellationToken);
+            await using var connection = await getConnection(cancellationToken);
             await using var command    = connection.CreateCommand();
             command.CommandType = CommandType.Text;
             command.CommandText = "IF EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME=@table) SELECT 1 ELSE SELECT 0";
@@ -101,7 +96,7 @@ public class SqlCheckpointStore : ICheckpointStore {
             return (exists == 1);
         }
 
-        Task CreateTable() => _getConnection.ExecuteNonQuery(CreateTableSql, _ => { }, cancellationToken);
+        Task CreateTable() => getConnection.ExecuteNonQuery(CreateTableSql, _ => { }, cancellationToken);
     }
 }
 
@@ -115,9 +110,9 @@ public static class DbCommandExtensionMethods {
 
     public static async Task ExecuteNonQuery(
         this GetConnection getConnection,
-        string query,
-        Action<DbCommand> configureCommand,
-        CancellationToken cancellationToken
+        string             query,
+        Action<DbCommand>  configureCommand,
+        CancellationToken  cancellationToken
     ) {
         await using var connection = await getConnection(cancellationToken);
         await using var command    = connection.CreateCommand();
@@ -139,6 +134,7 @@ public static class DbCommandExtensionMethods {
         command.CommandType = CommandType.Text;
         command.CommandText = query;
         configureCommand(command);
+
         return await action(command, cancellationToken);
     }
 }

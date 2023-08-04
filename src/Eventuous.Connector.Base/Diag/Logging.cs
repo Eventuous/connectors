@@ -21,11 +21,10 @@ public static class Logging {
         var sc = sinkConfiguration ?? DefaultSink;
 
         var logLevel = minimumLogLevel
-                    ?? (environment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information);
+         ?? (environment.IsDevelopment() ? LogEventLevel.Debug : LogEventLevel.Information);
 
         var logConfig = new LoggerConfiguration()
             .MinimumLevel.Is(logLevel)
-            // .MinimumLevel.Override("Eventuous", LogEventLevel.Verbose)
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Grpc", LogEventLevel.Fatal)
             .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", LogEventLevel.Warning)
@@ -53,4 +52,15 @@ public static class Logging {
         Log.Logger = GetLogger(builder.Environment, minimumLogLevel, sinkConfiguration, configure);
         builder.Host.UseSerilog();
     }
+
+    public static LogEventLevel? ParseLogLevel(string logLevel)
+        => logLevel.ToUpper() switch {
+            "TRACE" => LogEventLevel.Verbose,
+            "DEBUG" => LogEventLevel.Debug,
+            "INFO"  => LogEventLevel.Information,
+            "WARN"  => LogEventLevel.Warning,
+            "ERROR" => LogEventLevel.Error,
+            "FATAL" => LogEventLevel.Fatal,
+            _       => null
+        };
 }

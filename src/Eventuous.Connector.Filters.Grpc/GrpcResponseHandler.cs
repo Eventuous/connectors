@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Text;
+using Eventuous.Connector.Filters.Grpc;
 using Eventuous.Diagnostics;
 using Eventuous.Subscriptions.Context;
 using Eventuous.Subscriptions.Filters;

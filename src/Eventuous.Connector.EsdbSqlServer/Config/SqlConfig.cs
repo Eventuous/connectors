@@ -4,5 +4,5 @@
 namespace Eventuous.Connector.EsdbSqlServer.Config;
 
 public record SqlConfig {
-    public string ConnectionString { get; init; } = null!;
+    public string ConnectionString { get; [UsedImplicitly] init; } = null!;
 }

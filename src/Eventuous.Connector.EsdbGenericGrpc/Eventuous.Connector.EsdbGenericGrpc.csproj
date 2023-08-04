@@ -14,11 +14,18 @@
         <ProjectReference Include="..\Eventuous.Connector.EsdbBase\Eventuous.Connector.EsdbBase.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <Protobuf Include="Protos\client.proto" GrpcServices="Client" />
-    </ItemGroup>
-    <ItemGroup>
       <Compile Include="..\Eventuous.Connector.Base\Tools\Ensure.cs">
         <Link>Tools\Ensure.cs</Link>
       </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <Protobuf Include="Protos\client.proto">
+        <GrpcServices>Client</GrpcServices>
+        <Access>Public</Access>
+        <ProtoCompile>True</ProtoCompile>
+        <CompileOutputs>True</CompileOutputs>
+        <OutputDir>obj/Debug/net7.0/</OutputDir>
+        <Generator>MSBuild:Compile</Generator>
+      </Protobuf>
     </ItemGroup>
 </Project>

@@ -16,14 +16,14 @@ public static class RetryPolicies {
         var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
         var log           = loggerFactory.CreateLogger(config.Connector.ConnectorId);
 
-        void LogRetry(Exception exception, int retry, TimeSpan delay, Context context)
-            => log.LogWarning("Retrying after {RetryAttempt} attempt(s), waiting for {Delay}", retry, delay);
-
         return Policy
             .Handle<T>()
             .WaitAndRetryForeverAsync(
                 (retryAttempt, _) => TimeSpan.FromMilliseconds(retryAttempt * 100),
                 LogRetry
             );
+
+        void LogRetry(Exception exception, int retry, TimeSpan delay, Context context)
+            => log.LogWarning("Retrying after {RetryAttempt} attempt(s), waiting for {Delay}", retry, delay);
     }
 }

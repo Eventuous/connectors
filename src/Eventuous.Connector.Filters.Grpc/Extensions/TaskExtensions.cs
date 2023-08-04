@@ -1,7 +1,7 @@
 // Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
 // Licensed under the Apache License, Version 2.0.
 
-namespace Eventuous.Connector.Base.Tools;
+namespace Eventuous.Connector.Filters.Grpc.Extensions;
 
 static class TaskExtensions {
     public static async Task WhenAll(this IEnumerable<ValueTask> tasks) {

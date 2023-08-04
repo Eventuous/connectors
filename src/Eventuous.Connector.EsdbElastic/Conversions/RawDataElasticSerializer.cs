@@ -5,27 +5,25 @@ using Elasticsearch.Net;
 
 namespace Eventuous.Connector.EsdbElastic.Conversions;
 
-public class RawDataElasticSerializer : IElasticsearchSerializer {
-    readonly IElasticsearchSerializer _builtIn;
+public class RawDataElasticSerializer(IElasticsearchSerializer builtIn) : IElasticsearchSerializer {
+    public object Deserialize(Type type, Stream stream) => builtIn.Deserialize(type, stream);
 
-    public RawDataElasticSerializer(IElasticsearchSerializer builtIn) => _builtIn = builtIn;
-    public object Deserialize(Type type, Stream stream) => _builtIn.Deserialize(type, stream);
+    public T Deserialize<T>(Stream stream) => builtIn.Deserialize<T>(stream);
 
-    public T Deserialize<T>(Stream stream) => _builtIn.Deserialize<T>(stream);
-
-    public Task<object> DeserializeAsync(
-        Type type, Stream stream, CancellationToken cancellationToken = default
-    )
-        => _builtIn.DeserializeAsync(type, stream, cancellationToken);
+    public Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default)
+        => builtIn.DeserializeAsync(type, stream, cancellationToken);
 
     public Task<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken = default)
-        => _builtIn.DeserializeAsync<T>(stream, cancellationToken);
+        => builtIn.DeserializeAsync<T>(stream, cancellationToken);
 
     public void Serialize<T>(
-        T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None
+        T                       data,
+        Stream                  stream,
+        SerializationFormatting formatting = SerializationFormatting.None
     ) {
         if (data is not string dataString) {
-            _builtIn.Serialize(data, stream, formatting);
+            builtIn.Serialize(data, stream, formatting);
+
             return;
         }
 
@@ -41,6 +39,7 @@ public class RawDataElasticSerializer : IElasticsearchSerializer {
         CancellationToken       cancellationToken = default
     ) {
         Serialize(data, stream, formatting);
+
         return Task.CompletedTask;
     }
 }

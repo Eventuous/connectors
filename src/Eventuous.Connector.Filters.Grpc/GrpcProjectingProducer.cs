@@ -1,13 +1,14 @@
 // Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
 // Licensed under the Apache License, Version 2.0.
 
+using System.Runtime.CompilerServices;
 using Eventuous.Producers;
 using Eventuous.Producers.Diagnostics;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 
-namespace Eventuous.Connector.Base.Grpc;
+namespace Eventuous.Connector.Filters.Grpc;
 
 public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOptions>
     where T : IEventProducer<TOptions>
@@ -22,12 +23,15 @@ public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOption
         var temp = new TEvent();
         _projectorsByName.Add(temp.Descriptor.FullName, ProjectAny);
 
+        return;
+
         static TEvent GetEvent(Any message) {
             var evt = new TEvent();
             evt.MergeFrom(message.Value);
             return evt;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         Task ProjectAny(ProjectionResponse responseContext, StreamName streamName, CancellationToken token) {
             var evt     = GetEvent(responseContext.Operation);
             var message = new ProjectedMessage<TEvent>(evt, streamName, responseContext.Metadata);

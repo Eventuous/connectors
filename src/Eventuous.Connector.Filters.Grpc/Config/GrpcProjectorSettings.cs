@@ -8,11 +8,13 @@ namespace Eventuous.Connector.Filters.Grpc.Config;
 
 public record GrpcProjectorSettings {
     // TODO: Add credentials
-    public string Uri         { get; init; } = "http://localhost:9200";
+    [PublicAPI]
+    public string Uri { get; init; } = "http://localhost:9200";
+
+    [PublicAPI]
     public string Credentials { get; init; } = "ssl";
 
-    public string GetHost()
-        => NotEmptyString(Uri, "gRPC projector URI");
+    public string GetHost() => NotEmptyString(Uri, "gRPC projector URI");
 
     public ChannelCredentials GetCredentials() {
         var setting = NotEmptyString(Credentials, "gRPC projector credentials");

@@ -17,7 +17,6 @@ var metricsExporters = new ExporterMappings<MeterProviderBuilder>()
     .Add("prometheus", b => b.AddPrometheusExporter())
     .Add("otlp", b => b.AddOtlpExporter());
 
-var app = new StartupBuilder("config.yaml", args)
-    .BuildApplication(tracingExporters, metricsExporters);
+var app = new StartupBuilder("config.yaml", args).BuildApplication(tracingExporters, metricsExporters);
 
 return await app.Run();

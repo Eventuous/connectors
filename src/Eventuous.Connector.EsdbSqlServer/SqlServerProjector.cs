@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using Eventuous.Connector.Base.Grpc;
+using Eventuous.Connector.Filters.Grpc;
 using Eventuous.Producers.Diagnostics;
 using Microsoft.Extensions.Logging;
 

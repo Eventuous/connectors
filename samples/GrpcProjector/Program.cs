@@ -1,5 +1,6 @@
 using GrpcProjector.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 
@@ -19,10 +20,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
 builder.Services.AddGrpc();
+builder.Services.AddGrpcSwagger();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1",
+        new OpenApiInfo { Title = "gRPC transcoding", Version = "v1" });
+});
 
-if (builder.Environment.IsDevelopment()) { builder.WebHost.ConfigureKestrel(options => options.ListenLocalhost(9091, o => o.Protocols = HttpProtocols.Http2)); }
+if (builder.Environment.IsDevelopment()) {
+    builder.WebHost.ConfigureKestrel(options => options.ListenLocalhost(9091, o => o.Protocols = HttpProtocols.Http1AndHttp2));
+}
 
 var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
 app.MapGrpcService<ProjectorService>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client");
 

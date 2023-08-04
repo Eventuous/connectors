@@ -1,7 +1,6 @@
 // Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
 // Licensed under the Apache License, Version 2.0.
 
-using Eventuous.Connector.Base.Grpc;
 using Eventuous.Gateway;
 using Eventuous.Subscriptions.Context;
 using Microsoft.Extensions.Logging;

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using Eventuous.Connector.Base.Grpc;
+using Eventuous.Connector.Filters.Grpc;
 using Eventuous.Producers.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Nest;
@@ -22,6 +23,8 @@ public class ElasticJsonProjector : GrpcProjectingProducer<ElasticJsonProjector,
         On<Index>((message,  token) => Execute(message, token, IndexOne));
         On<Update>((message, token) => Execute(message, token, UpdateOne));
 
+        return;
+
         async Task Execute<T>(
             ProjectedMessage<T>                                              msg,
             CancellationToken                                                cancellationToken,
@@ -41,12 +44,9 @@ public class ElasticJsonProjector : GrpcProjectingProducer<ElasticJsonProjector,
         ProduceOperation = "project"
     };
 
-    async Task<ElasticCallResponse> IndexOne(
-        Index             operation,
-        IndexName         indexName,
-        CancellationToken cancellationToken
-    ) {
-        _log.LogTrace("Indexing document with id {id} to {index}", operation.Id, indexName);
+    async Task<ElasticCallResponse> IndexOne(Index operation, IndexName indexName, CancellationToken cancellationToken) {
+        _log.LogTrace("Indexing document with id {Id} to {Index}", operation.Id, indexName);
+
         var response = await _elasticClient.IndexAsync(
             new IndexRequest<object>(operation.Document.ToString(), indexName, operation.Id),
             cancellationToken
@@ -55,12 +55,9 @@ public class ElasticJsonProjector : GrpcProjectingProducer<ElasticJsonProjector,
         return new ElasticCallResponse(response.IsValid, response.DebugInformation, response.OriginalException);
     }
 
-    async Task<ElasticCallResponse> UpdateOne(
-        Update            operation,
-        IndexName         indexName,
-        CancellationToken cancellationToken
-    ) {
-        _log.LogTrace("Updating document with id {id} to {index}", operation.Id, indexName);
+    async Task<ElasticCallResponse> UpdateOne(Update operation, IndexName indexName, CancellationToken cancellationToken) {
+        _log.LogTrace("Updating document with id {Id} to {Index}", operation.Id, indexName);
+
         var response = await _elasticClient.UpdateAsync(
             new UpdateRequest<object, object>(indexName, operation.Id) {
                 Doc = operation.Document.ToString()

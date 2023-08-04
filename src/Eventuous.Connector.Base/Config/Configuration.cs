@@ -12,5 +12,5 @@ public static class Configuration {
 
     public static ConnectorConfig<TSource, TTarget, TFilter> GetConnectorConfig<TSource, TTarget, TFilter>(this IConfiguration configuration)
         where TSource : class where TTarget : class where TFilter : class
-        => configuration.Get<ConnectorConfig<TSource, TTarget, TFilter>>();
+        => configuration.Get<ConnectorConfig<TSource, TTarget, TFilter>>() ?? throw new ApplicationException("Configuration not found");
 }

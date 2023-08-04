@@ -28,7 +28,8 @@ public class ProjectorStartup : EsdbProjectorStartup<SqlConfig, SqlServerProject
             serviceProvider.GetRequiredService<ILogger<GrpcTransform<SqlServerProjectOptions>>>()
         );
 
-    protected override IAsyncPolicy GetRetryPolicy(IServiceProvider serviceProvider, ConnectorConfig config) => RetryPolicies.RetryForever<SqlException>(serviceProvider, config);
+    protected override IAsyncPolicy GetRetryPolicy(IServiceProvider serviceProvider, ConnectorConfig config)
+        => RetryPolicies.RetryForever<SqlException>(serviceProvider, config);
 
     protected override void ConfigureSubscription(SubscriptionBuilder<AllStreamSubscription, AllStreamSubscriptionOptions> builder)
         => builder.UseCheckpointStore<SqlCheckpointStore>();

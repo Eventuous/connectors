@@ -10,12 +10,12 @@ public delegate Task<DbConnection> GetConnection(CancellationToken cancellationT
 
 public static class ConnectionFactory {
     public static GetConnection GetConnectionFactory(string connectionString) {
+        return GetConnection;
+
         async Task <DbConnection> GetConnection(CancellationToken cancellationToken) {
             var connection = new SqlConnection(connectionString);
             await connection.OpenAsync(cancellationToken);
             return connection;
         }
-        
-        return GetConnection;
     }
 }

@@ -55,7 +55,8 @@ public abstract class EsdbProjectorStartup<TConfig, TProjector, TProjectorOption
 
     ConnectorBuilder<AllStreamSubscription, AllStreamSubscriptionOptions, TProjector, TProjectorOptions> ConfigureProjectConnector(
         ConnectorBuilder                                            builder,
-        ConnectorConfig<EsdbConfig, TConfig, GrpcProjectorSettings> config
+        ConnectorConfig<EsdbConfig, TConfig, GrpcProjectorSettings> config,
+        IHealthChecksBuilder                                        healthChecks
     ) {
         var serializer       = new RawDataDeserializer();
         var concurrencyLimit = config.Source.ConcurrencyLimit;
@@ -67,7 +68,7 @@ public abstract class EsdbProjectorStartup<TConfig, TProjector, TProjectorOption
                 b => {
                     ConfigureSubscription(b);
                     b.WithPartitioningByStream(concurrencyLimit);
-                    b.AddGrpcProjector(NotNull(config.Filter));
+                    b.AddGrpcProjector(NotNull(config.Filter), healthChecks);
                 }
             )
             .ProduceWith<TProjector, TProjectorOptions>(sp => GetRetryPolicy(sp, config))

@@ -3,15 +3,16 @@
 
 using System.Runtime.CompilerServices;
 using Eventuous.Connector.Base.Grpc;
-using Eventuous.Connector.Base.Tools;
+using Eventuous.Connector.Filters.Grpc.Extensions;
 using Eventuous.Subscriptions.Context;
 using Eventuous.Subscriptions.Filters;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Eventuous.Connector.Filters.Grpc;
 
-public sealed class GrpcProjectionFilter : ConsumeFilter<AsyncConsumeContext>, IAsyncDisposable {
+public sealed class GrpcProjectionFilter : ConsumeFilter<AsyncConsumeContext>, IHealthCheck, IAsyncDisposable {
     GrpcPartition?[]                 _partitions = Array.Empty<GrpcPartition>();
     readonly Func<GrpcPartition>     _partitionFactory;
     readonly CancellationTokenSource _cts;
@@ -36,6 +37,8 @@ public sealed class GrpcProjectionFilter : ConsumeFilter<AsyncConsumeContext>, I
             }
         );
 
+        return;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         GrpcPartition GetPartition() {
             if (_partitions.Length <= context.PartitionId) {
@@ -57,6 +60,23 @@ public sealed class GrpcProjectionFilter : ConsumeFilter<AsyncConsumeContext>, I
     public async ValueTask DisposeAsync() {
         _cts.Cancel();
         await _partitions.Where(x => x != null).Select(x => x!.Projector.DisposeAsync()).WhenAll();
+    }
+
+    public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default) {
+        var status = HealthCheckResult.Healthy();
+
+        // ReSharper disable once ForCanBeConvertedToForeach
+        for (var i = 0; i < _partitions.Length; i++) {
+            var partitionProjector = _partitions[i]?.Projector;
+            if (partitionProjector == null) continue;
+
+            var partitionStatus = partitionProjector.GetStatus();
+            if (partitionStatus.Status < status.Status) {
+                status = partitionStatus;
+            }
+        }
+
+        return Task.FromResult(status);
     }
 
     record GrpcPartition {

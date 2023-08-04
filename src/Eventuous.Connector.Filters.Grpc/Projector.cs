@@ -1,12 +1,14 @@
 // Copyright (C) 2021-2022 Ubiquitous AS. All rights reserved
 // Licensed under the Apache License, Version 2.0.
 
+using System.Runtime.CompilerServices;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Configuration;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
 
-namespace Eventuous.Connector.Base.Grpc;
+namespace Eventuous.Connector.Filters.Grpc;
 
 public sealed class Projector : IAsyncDisposable {
     static readonly ILogger Log = Serilog.Log.ForContext<Projector>();
@@ -14,10 +16,10 @@ public sealed class Projector : IAsyncDisposable {
     readonly MethodConfig _defaultMethodConfig = new() {
         Names = { MethodName.Default },
         RetryPolicy = new RetryPolicy {
-            MaxAttempts = 20,
-            InitialBackoff = TimeSpan.FromSeconds(1),
-            MaxBackoff = TimeSpan.FromSeconds(5),
-            BackoffMultiplier = 1.5,
+            MaxAttempts          = 20,
+            InitialBackoff       = TimeSpan.FromSeconds(1),
+            MaxBackoff           = TimeSpan.FromSeconds(5),
+            BackoffMultiplier    = 1.5,
             RetryableStatusCodes = { StatusCode.Unavailable }
         }
     };
@@ -28,6 +30,8 @@ public sealed class Projector : IAsyncDisposable {
     Task?                    _readTask;
     CancellationTokenSource? _cts;
     CancellationToken        _ct;
+    HealthCheckResult        _status;
+    string                   _host;
 
     AsyncDuplexStreamingCall<ProjectionRequest, ProjectionResponse>? _call;
 
@@ -37,26 +41,32 @@ public sealed class Projector : IAsyncDisposable {
         Func<ProjectionResponse, CancellationToken, Task> handler
     ) {
         _handler = handler;
+        _host    = host;
 
         var channel = GrpcChannel.ForAddress(
             host,
             new GrpcChannelOptions {
-                Credentials = credentials,
+                Credentials   = credentials,
                 ServiceConfig = new ServiceConfig { MethodConfigs = { _defaultMethodConfig } }
             }
         );
 
         _client = new Projection.ProjectionClient(channel);
+        _status = HealthCheckResult.Healthy(host);
     }
 
     public void Run(CancellationToken cancellationToken) {
         _cts = new CancellationTokenSource();
-        _ct = cancellationToken;
+        _ct  = cancellationToken;
         var linked = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, _ct);
 
         _call = _client.Project(cancellationToken: linked.Token);
 
         _call.RequestStream.WriteOptions = new WriteOptions(WriteFlags.BufferHint);
+
+        _readTask = Task.Run(HandleResponses, linked.Token);
+
+        return;
 
         async Task HandleResponses() {
             Log.Information("Subscribing...");
@@ -67,8 +77,6 @@ public sealed class Projector : IAsyncDisposable {
                 await _handler(response, linked.Token);
             }
         }
-
-        _readTask = Task.Run(HandleResponses, linked.Token);
     }
 
     async Task Resubscribe() {
@@ -82,8 +90,7 @@ public sealed class Projector : IAsyncDisposable {
         if (_readTask != null) {
             try {
                 await AwaitCancelled(() => _readTask);
-            }
-            catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable) {
+            } catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable) {
                 Log.Warning("Server unavailable");
             }
 
@@ -91,49 +98,63 @@ public sealed class Projector : IAsyncDisposable {
             _readTask = null;
         }
 
-        _cts = null;
+        _cts  = null;
         _call = null;
         Run(_ct);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public async Task Project(ProjectionRequest projectionContext) {
-        var retry = 100;
+        var retry = 0;
 
-        while (retry-- > 0 && !_disposing) {
-            var r = await ProjectInternal();
+        while (!_disposing && !_ct.IsCancellationRequested) {
+            var r = await ProjectInternal(projectionContext);
 
-            if (r == ProjectResult.Ok) {
-                break;
-            }
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+            switch (r.Result) {
+                case ProjectResult.Ok:
+                    return;
+                case ProjectResult.Retry:
+                    _status = HealthCheckResult.Degraded(_host, r.Exception);
+                    Log.Information("Retrying {Retry}", ++retry);
+                    await Task.Delay(retry, _ct);
 
-            Log.Information($"Retrying {100 - retry}");
-        }
+                    break;
+                case ProjectResult.Fail:
+                    _status = HealthCheckResult.Unhealthy(_host, r.Exception);
+                    Log.Error("Projector to {Host} failed", _host);
+                    retry++;
+                    await Task.Delay(retry ^ 2, _ct);
 
-        async Task<ProjectResult> ProjectInternal() {
-            try {
-                await _call!.RequestStream.WriteAsync(projectionContext, _ct);
-                return ProjectResult.Ok;
-            }
-            catch (InvalidOperationException e)
-                when (e.Message.Contains("previous write is in progress")) {
-                // TODO: this is a hack, it needs to open multiple streams for concurrent projectors
-                Log.Warning("Write already in progress");
-                return ProjectResult.Retry;
-            }
-            catch (ObjectDisposedException) {
-                await Resubscribe();
-                return ProjectResult.Retry;
-            }
-            catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable) {
-                await Resubscribe();
-                return ProjectResult.Retry;
-            }
-            catch (Exception e) {
-                Log.Error(e, "Projection failed");
-                throw;
+                    break;
             }
         }
     }
+
+    async Task<(ProjectResult Result, Exception? Exception)> ProjectInternal(ProjectionRequest projectionContext) {
+        try {
+            await _call!.RequestStream.WriteAsync(projectionContext, _ct);
+
+            return (ProjectResult.Ok, null);
+        } catch (InvalidOperationException e)
+            when (e.Message.Contains("previous write is in progress")) {
+            Log.Warning("Write already in progress");
+
+            return (ProjectResult.Retry, e);
+        } catch (ObjectDisposedException e) {
+            await Resubscribe();
+
+            return (ProjectResult.Retry, e);
+        } catch (RpcException e) when (e.StatusCode == StatusCode.Unavailable) {
+            await Resubscribe();
+
+            return (ProjectResult.Retry, e);
+        } catch (Exception e) {
+            return (ProjectResult.Fail, e);
+        }
+    }
+
+    public HealthCheckResult GetStatus() => _status;
 
     bool _disposing;
 
@@ -160,13 +181,12 @@ public sealed class Projector : IAsyncDisposable {
     static async Task AwaitCancelled(Func<Task> action) {
         try {
             await action();
-        }
-        catch (OperationCanceledException) { }
-        catch (RpcException e) when (e.StatusCode == StatusCode.Cancelled) { }
+        } catch (OperationCanceledException) { } catch (RpcException e) when (e.StatusCode == StatusCode.Cancelled) { }
     }
 }
 
 public enum ProjectResult {
     Ok,
-    Retry
+    Retry,
+    Fail
 }

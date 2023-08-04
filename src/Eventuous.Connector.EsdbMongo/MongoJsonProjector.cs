@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0.
 
 using Eventuous.Connector.Base.Grpc;
+using Eventuous.Connector.Filters.Grpc;
 using Eventuous.Producers.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -13,7 +14,8 @@ public class MongoJsonProjector : GrpcProjectingProducer<MongoJsonProjector, Mon
     readonly IMongoDatabase              _database;
     readonly ILogger<MongoJsonProjector> _log;
 
-    public MongoJsonProjector(IMongoDatabase database, ILogger<MongoJsonProjector> log) : base(TracingOptions) {
+    public MongoJsonProjector(IMongoDatabase database, ILogger<MongoJsonProjector> log)
+        : base(TracingOptions) {
         _database = database;
         _log      = log;
 
@@ -38,7 +40,7 @@ public class MongoJsonProjector : GrpcProjectingProducer<MongoJsonProjector, Mon
             .GetCollection<BsonDocument>(collection)
             .InsertOneAsync(BsonDocument.Parse(insertOne.Document.ToString()), cancellationToken: cancellationToken);
     }
-    
+
     Task InsertMany(string collection, InsertMany insertMany, CancellationToken cancellationToken) {
         _log.LogTrace("Inserting {@Documents}", insertMany);
 
@@ -61,7 +63,7 @@ public class MongoJsonProjector : GrpcProjectingProducer<MongoJsonProjector, Mon
 
     Task UpdateMany(string collection, UpdateMany updateMany, CancellationToken cancellationToken) {
         _log.LogTrace("Updating with {@Update}", updateMany);
-        
+
         return _database.GetCollection<BsonDocument>(collection)
             .UpdateManyAsync(
                 new JsonFilterDefinition<BsonDocument>(updateMany.Filter.ToString()),

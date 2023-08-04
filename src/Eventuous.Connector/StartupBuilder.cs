@@ -13,9 +13,9 @@ using ILogger = Serilog.ILogger;
 namespace Eventuous.Connector;
 
 sealed class StartupBuilder {
-    readonly ConnectorConfig? _config;
-    ConnectorApp?             _app;
-    readonly string?          _configFile;
+    readonly ConnectorConfig _config;
+    readonly string?         _configFile;
+    ConnectorApp?            _app;
 
     static readonly ILogger Log = Serilog.Log.ForContext<StartupBuilder>();
 
@@ -27,10 +27,13 @@ sealed class StartupBuilder {
         var hostBuilder = Host.CreateDefaultBuilder(args);
         hostBuilder.ConfigureHostConfiguration(c => c.AddYamlFile(configFile));
         using var tempHost = hostBuilder.Build();
-        _config = tempHost.Services.GetRequiredService<IConfiguration>().Get<ConnectorConfig>();
+        _config = tempHost.Services
+            .GetRequiredService<IConfiguration>()
+            .Get<ConnectorConfig>(b => b.ErrorOnUnknownConfiguration = true)!;
 
         if (string.IsNullOrWhiteSpace(_config.Connector.ConnectorAssembly)) {
             Log.Fatal("Connector assembly must be specified in {ConfigFile}", configFile);
+
             throw new ApplicationException();
         }
     }
@@ -39,11 +42,6 @@ sealed class StartupBuilder {
         ExporterMappings<TracerProviderBuilder> tracingExporters,
         ExporterMappings<MeterProviderBuilder>  metricsExporters
     ) {
-        if (_config == null) {
-            Log.Fatal("Call Configure() first");
-            throw new ApplicationException();
-        }
-
         var location = Assembly.GetExecutingAssembly().Location;
         var path     = Path.GetDirectoryName(location);
 
@@ -58,6 +56,7 @@ sealed class StartupBuilder {
 
         if (startup == null) {
             Log.Fatal("Connector assembly must have an implementation of IConnectorStartup");
+
             throw new ApplicationException();
         }
 
@@ -73,11 +72,13 @@ sealed class StartupBuilder {
     public async Task<int> Run() {
         if (_config == null) {
             Log.Fatal("Call Configure() first");
+
             throw new ApplicationException();
         }
 
         if (_app == null) {
             Log.Fatal("Call BuildApplication() first");
+
             throw new ApplicationException();
         }
 

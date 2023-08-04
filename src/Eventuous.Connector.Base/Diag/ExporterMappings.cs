@@ -16,17 +16,17 @@ public class ExporterMappings<T> {
     public void RegisterExporters(T provider, string[]? exporters) {
         var name = typeof(T).Name;
         if (exporters == null) {
-            Log.Warning("No exporters for {name} available", name);
+            Log.Warning("No exporters for {Name} available", name);
             return;
         }
 
         foreach (var exporter in exporters) {
             if (_mappings.TryGetValue(exporter, out var addExporter)) {
-                Log.Information("Adding exporter {exporter} for {name}", exporter, name);
+                Log.Information("Adding exporter {Exporter} for {Name}", exporter, name);
                 addExporter(provider);
             }
             else {
-                Log.Information("No exporters specified for {exporter}", exporter);
+                Log.Information("No exporters specified for {Exporter}", exporter);
             }
         }
     }

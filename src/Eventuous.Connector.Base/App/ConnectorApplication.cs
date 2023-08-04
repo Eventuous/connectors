@@ -27,7 +27,11 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
     public delegate void ResolveDependencies(IServiceCollection services, ConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig> config);
 
     public delegate ConnectorBuilder<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions> ConfigureConnector<TSubscription, TSubscriptionOptions,
-        TProducer, TProduceOptions>(ConnectorBuilder builder, ConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig> config)
+        TProducer, TProduceOptions>(
+        ConnectorBuilder                                             builder,
+        ConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig> config,
+        IHealthChecksBuilder                                         healthChecks
+    )
         where TSubscription : EventSubscription<TSubscriptionOptions>
         where TSubscriptionOptions : SubscriptionOptions
         where TProducer : class, IEventProducer<TProduceOptions>
@@ -43,14 +47,17 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
         Config = Builder.Configuration.GetConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig>();
         Builder.Services.AddSingleton(Config.Source);
         Builder.Services.AddSingleton(Config.Target);
+        HealthChecks = Builder.Services.AddHealthChecks();
 
         if (!Config.Connector.Diagnostics.Enabled) { Environment.SetEnvironmentVariable("EVENTUOUS_DISABLE_DIAGS", "1"); }
+
+        var logLevel = Logging.ParseLogLevel(Config.Connector.LogLevel);
+        ConfigureSerilog(logLevel);
     }
 
-    [PublicAPI]
-    public WebApplicationBuilder Builder { get; }
+    public IHealthChecksBuilder HealthChecks { get; }
+    WebApplicationBuilder       Builder      { get; }
 
-    [PublicAPI]
     public ConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig> Config { get; }
 
     [PublicAPI]
@@ -64,10 +71,8 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
         _configureLogger   = configureLogger;
     }
 
-    [PublicAPI]
     public void RegisterDependencies(ResolveDependencies configure) => configure(Builder.Services, Config);
 
-    [PublicAPI]
     public void RegisterConnector<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions>(
         ConfigureConnector<TSubscription, TSubscriptionOptions, TProducer, TProduceOptions> configure
     )
@@ -75,15 +80,15 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
         where TSubscriptionOptions : SubscriptionOptions
         where TProducer : class, IEventProducer<TProduceOptions>
         where TProduceOptions : class {
-        var builder = configure(new ConnectorBuilder(), Config);
-        builder.Register(Builder.Services);
+        var builder = configure(new ConnectorBuilder(), Config, HealthChecks);
+        builder.Register(Builder.Services, HealthChecks);
     }
 
     const string ConnectorIdTag = "connectorId";
 
     void EnrichActivity(Activity activity, string arg1, object arg2) => activity.AddTag(ConnectorIdTag, Config.Connector.ConnectorId);
 
-    bool _otelAdded;
+    bool _oTelAdded;
 
     [PublicAPI]
     public void AddOpenTelemetry(
@@ -93,16 +98,16 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
         ExporterMappings<TracerProviderBuilder>?                         tracingExporters = null,
         ExporterMappings<MeterProviderBuilder>?                          metricsExporters = null
     ) {
-        _otelAdded = true;
+        _oTelAdded = true;
 
         if (!Config.Connector.Diagnostics.Enabled) { return; }
 
         EventuousDiagnostics.AddDefaultTag(ConnectorIdTag, Config.Connector.ConnectorId);
 
-        var otelBuilder = Builder.Services.AddOpenTelemetry();
+        var oTelBuilder = Builder.Services.AddOpenTelemetry();
 
         if (Config.Connector.Diagnostics.Tracing is { Enabled: true }) {
-            otelBuilder.WithTracing(
+            oTelBuilder.WithTracing(
                 cfg => {
                     cfg.AddEventuousTracing();
 
@@ -117,7 +122,7 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
         }
 
         if (Config.Connector.Diagnostics.Metrics is { Enabled: true }) {
-            otelBuilder.WithMetrics(
+            oTelBuilder.WithMetrics(
                 cfg => {
                     cfg.AddEventuous().AddEventuousSubscriptions();
                     configureMetrics?.Invoke(cfg);
@@ -133,7 +138,7 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
 
         Builder.Services.AddHealthChecks().AddSubscriptionsHealthCheck("Subscriptions", HealthStatus.Unhealthy, new[] { Config.Connector.ConnectorId });
 
-        if (!_otelAdded) { AddOpenTelemetry(); }
+        if (!_oTelAdded) { AddOpenTelemetry(); }
 
         var app = Builder.Build();
 
@@ -156,6 +161,8 @@ public class ConnectorApp {
     internal ConnectorApp(WebApplication host) => Host = host;
 
     public async Task<int> Run() {
+        Host.MapHealthChecks("/health");
+
         try {
             await Host.RunConnector();
 
