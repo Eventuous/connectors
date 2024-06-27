@@ -11,7 +11,7 @@ using Google.Protobuf.WellKnownTypes;
 namespace Eventuous.Connector.Filters.Grpc;
 
 public abstract class GrpcProjectingProducer<T, TOptions> : BaseProducer<TOptions>
-    where T : IEventProducer<TOptions>
+    where T : class, IProducer<TOptions>
     where TOptions : class {
     protected GrpcProjectingProducer(ProducerTracingOptions? tracingOptions = null) : base(tracingOptions) { }
 

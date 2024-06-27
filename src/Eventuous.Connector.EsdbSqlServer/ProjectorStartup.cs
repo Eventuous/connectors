@@ -37,6 +37,6 @@ public class ProjectorStartup : EsdbProjectorStartup<SqlConfig, SqlServerProject
     protected override void RegisterTarget(IServiceCollection services, SqlConfig config)
         => services.AddSingleton(ConnectionFactory.GetConnectionFactory(Ensure.NotEmptyString(config.ConnectionString, "SQL connection string")));
 
-    protected override void ConfigureTrace(TracerProviderBuilder builder, Action<Activity, string, object> enrich)
-        => builder.AddSqlClientInstrumentation(options => options.Enrich = enrich);
+    protected override void ConfigureTrace(TracerProviderBuilder builder, Action<Activity> enrich)
+        => builder.AddSqlClientInstrumentation(options => options.Enrich = (activity, _, _) => enrich(activity));
 }

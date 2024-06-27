@@ -34,12 +34,12 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
     )
         where TSubscription : EventSubscription<TSubscriptionOptions>
         where TSubscriptionOptions : SubscriptionOptions
-        where TProducer : class, IEventProducer<TProduceOptions>
+        where TProducer : class, IProducer<TProduceOptions>
         where TProduceOptions : class;
 
-    LogEventLevel?                                      _minimumLogLevel;
+    LogEventLevel? _minimumLogLevel;
     Func<LoggerSinkConfiguration, LoggerConfiguration>? _sinkConfiguration;
-    Func<LoggerConfiguration, LoggerConfiguration>?     _configureLogger;
+    Func<LoggerConfiguration, LoggerConfiguration>? _configureLogger;
 
     internal ConnectorApplicationBuilder(string configFile) {
         Builder = WebApplication.CreateBuilder();
@@ -56,7 +56,7 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
     }
 
     public IHealthChecksBuilder HealthChecks { get; }
-    WebApplicationBuilder       Builder      { get; }
+    WebApplicationBuilder Builder { get; }
 
     public ConnectorConfig<TSourceConfig, TTargetConfig, TFilterConfig> Config { get; }
 
@@ -78,7 +78,7 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
     )
         where TSubscription : EventSubscription<TSubscriptionOptions>
         where TSubscriptionOptions : SubscriptionOptions
-        where TProducer : class, IEventProducer<TProduceOptions>
+        where TProducer : class, IProducer<TProduceOptions>
         where TProduceOptions : class {
         var builder = configure(new ConnectorBuilder(), Config, HealthChecks);
         builder.Register(Builder.Services, HealthChecks);
@@ -86,17 +86,17 @@ public class ConnectorApplicationBuilder<TSourceConfig, TTargetConfig, TFilterCo
 
     const string ConnectorIdTag = "connectorId";
 
-    void EnrichActivity(Activity activity, string arg1, object arg2) => activity.AddTag(ConnectorIdTag, Config.Connector.ConnectorId);
+    void EnrichActivity(Activity activity) => activity.AddTag(ConnectorIdTag, Config.Connector.ConnectorId);
 
     bool _oTelAdded;
 
     [PublicAPI]
     public void AddOpenTelemetry(
-        Action<TracerProviderBuilder, Action<Activity, string, object>>? configureTracing = null,
-        Action<MeterProviderBuilder>?                                    configureMetrics = null,
-        Sampler?                                                         sampler          = null,
-        ExporterMappings<TracerProviderBuilder>?                         tracingExporters = null,
-        ExporterMappings<MeterProviderBuilder>?                          metricsExporters = null
+        Action<TracerProviderBuilder, Action<Activity>>? configureTracing = null,
+        Action<MeterProviderBuilder>?                    configureMetrics = null,
+        Sampler?                                         sampler          = null,
+        ExporterMappings<TracerProviderBuilder>?         tracingExporters = null,
+        ExporterMappings<MeterProviderBuilder>?          metricsExporters = null
     ) {
         _oTelAdded = true;
 

@@ -29,7 +29,7 @@ sealed class StartupBuilder {
         using var tempHost = hostBuilder.Build();
         _config = tempHost.Services
             .GetRequiredService<IConfiguration>()
-            .Get<ConnectorConfig>(b => b.ErrorOnUnknownConfiguration = true)!;
+            .Get<ConnectorConfig>(b => b.ErrorOnUnknownConfiguration = false)!;
 
         if (string.IsNullOrWhiteSpace(_config.Connector.ConnectorAssembly)) {
             Log.Fatal("Connector assembly must be specified in {ConfigFile}", configFile);

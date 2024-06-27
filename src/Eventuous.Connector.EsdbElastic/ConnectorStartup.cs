@@ -50,8 +50,8 @@ public class ConnectorStartup : IConnectorStartup {
         builder.AddOpenTelemetry(
             (cfg, enrich) =>
                 cfg
-                    .AddGrpcClientInstrumentation(options => options.Enrich          = enrich)
-                    .AddElasticsearchClientInstrumentation(options => options.Enrich = enrich),
+                    .AddGrpcClientInstrumentation(options => options.EnrichWithHttpRequestMessage = (activity, _) => enrich(activity))
+                    .AddElasticsearchClientInstrumentation(options => options.Enrich              = (activity, _, _) => enrich(activity)),
             sampler: new AlwaysOnSampler(),
             tracingExporters: tracingExporters,
             metricsExporters: metricsExporters

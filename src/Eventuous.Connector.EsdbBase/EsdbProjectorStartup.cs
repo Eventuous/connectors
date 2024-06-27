@@ -26,7 +26,7 @@ namespace Eventuous.Connector.EsdbBase;
 
 public abstract class EsdbProjectorStartup<TConfig, TProjector, TProjectorOptions> : IConnectorStartup
     where TConfig : class
-    where TProjector : class, IEventProducer<TProjectorOptions>
+    where TProjector : class, IProducer<TProjectorOptions>
     where TProjectorOptions : class, new() {
     public ConnectorApp BuildConnectorApp(
         string                                  configFile,
@@ -40,7 +40,7 @@ public abstract class EsdbProjectorStartup<TConfig, TProjector, TProjectorOption
 
         builder.AddOpenTelemetry(
             (cfg, enrich) => {
-                cfg.AddGrpcClientInstrumentation(options => options.Enrich = enrich);
+                cfg.AddGrpcClientInstrumentation(options => options.EnrichWithHttpRequestMessage = (a, _) => enrich(a));
                 ConfigureTrace(cfg, enrich);
             },
             sampler: new AlwaysOnSampler(),
@@ -86,5 +86,5 @@ public abstract class EsdbProjectorStartup<TConfig, TProjector, TProjectorOption
 
     protected abstract void RegisterTarget(IServiceCollection services, TConfig config);
 
-    protected abstract void ConfigureTrace(TracerProviderBuilder builder, Action<Activity, string, object> enrich);
+    protected abstract void ConfigureTrace(TracerProviderBuilder builder, Action<Activity> enrich);
 }

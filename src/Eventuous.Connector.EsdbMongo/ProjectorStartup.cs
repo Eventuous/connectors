@@ -46,5 +46,5 @@ public class ProjectorStartup : EsdbProjectorStartup<MongoConfig, MongoJsonProje
             Ensure.NotEmptyString(config.Database, "MongoDB database")
         );
 
-    protected override void ConfigureTrace(TracerProviderBuilder builder, Action<Activity, string, object> enrich) => builder.AddMongoDBInstrumentation();
+    protected override void ConfigureTrace(TracerProviderBuilder builder, Action<Activity> enrich) => builder.AddMongoDBInstrumentation();
 }

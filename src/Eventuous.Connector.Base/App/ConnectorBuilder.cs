@@ -49,7 +49,7 @@ public class ConnectorBuilder<TSub, TSubOptions> : ConnectorBuilder
     [PublicAPI]
     public ConnectorBuilder<TSub, TSubOptions, TProducer, TProduceOptions>
         ProduceWith<TProducer, TProduceOptions>(ResolveRetryPolicy? retryPolicy = null, bool awaitProduce = true)
-        where TProducer : class, IEventProducer<TProduceOptions>
+        where TProducer : class, IProducer<TProduceOptions>
         where TProduceOptions : class
         => new(this, retryPolicy, awaitProduce);
 
@@ -68,7 +68,7 @@ public class ConnectorBuilder<TSub, TSubOptions, TProducer, TProduceOptions>(
 )
     where TSub : EventSubscription<TSubOptions>
     where TSubOptions : SubscriptionOptions
-    where TProducer : class, IEventProducer<TProduceOptions>
+    where TProducer : class, IProducer<TProduceOptions>
     where TProduceOptions : class {
     Func<IServiceProvider, IGatewayTransform<TProduceOptions>>? _getTransformer;
     Type?                                                       _transformerType;

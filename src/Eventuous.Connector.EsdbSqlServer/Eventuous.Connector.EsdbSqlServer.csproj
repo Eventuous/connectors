@@ -3,13 +3,13 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" Version="$(EventuousVersion)" />
-        <PackageReference Include="Eventuous.EventStore" Version="$(EventuousVersion)" />
-        <PackageReference Include="Eventuous.Subscriptions.Polly" Version="$(EventuousVersion)" />
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="$(OtelExtensionsVersion)" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="$(OtelExtensionsVersion)" />
-        <PackageReference Include="Grpc.Tools" Version="2.48.1" PrivateAssets="All" />
+        <PackageReference Include="Eventuous.Diagnostics.OpenTelemetry" />
+        <PackageReference Include="Eventuous.EventStore" />
+        <PackageReference Include="Eventuous.Subscriptions.Polly" />
+        <PackageReference Include="Microsoft.Data.SqlClient" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" />
+        <PackageReference Include="Grpc.Tools" PrivateAssets="All" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Eventuous.Connector.Base\Eventuous.Connector.Base.csproj" />

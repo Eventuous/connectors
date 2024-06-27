@@ -3,15 +3,16 @@
         <IsPackable>true</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Eventuous.Gateway" Version="$(EventuousVersion)" />
-        <PackageReference Include="Google.Protobuf" Version="3.23.2" />
-        <PackageReference Include="Grpc.Core.Api" Version="2.48.0" />
-        <PackageReference Include="Serilog" Version="2.12.0" />
-        <PackageReference Include="Grpc.Tools" Version="2.48.1" PrivateAssets="All" />
-        <PackageReference Include="Grpc.AspNetCore" Version="2.48.0" />
+        <PackageReference Include="Eventuous.Gateway"/>
+        <PackageReference Include="Google.Protobuf"/>
+        <PackageReference Include="Grpc.Core.Api"/>
+        <PackageReference Include="Serilog"/>
+        <PackageReference Include="Grpc.Tools"/>
+        <PackageReference Include="Grpc.AspNetCore"/>
+        <PackageReference Include="MinVer"/>
     </ItemGroup>
     <ItemGroup>
-        <Protobuf Include="Protos\project.proto" GrpcServices="Client" />
+        <Protobuf Include="Protos\project.proto" GrpcServices="Client"/>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="..\Eventuous.Connector.Base\Tools\Ensure.cs">

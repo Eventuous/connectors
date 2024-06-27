@@ -20,5 +20,9 @@
 
     <ItemGroup Condition="$(Configuration) == 'Debug'">
         <None Update="config.yaml" CopyToOutputDirectory="Always" CopyToPublishDirectory="Never"/>
+        <None Update="config-grpc-local.yaml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
     </ItemGroup>
 </Project>
