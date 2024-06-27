@@ -1,0 +1,20 @@
+{
+  "id": "index",
+  "title": "Connector concept",
+  "description": "What is Eventuous Connector and how to use it",
+  "source": "@site/docs/index.mdx",
+  "sourceDirName": ".",
+  "slug": "/",
+  "permalink": "/docs/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/eventuous/connectors/docs/edit/master/docs/index.mdx",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "title": "Connector concept",
+    "description": "What is Eventuous Connector and how to use it",
+    "sidebar_position": 1
+  }
+}

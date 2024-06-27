@@ -1,0 +1,27 @@
+{
+  "id": "sinks/sqlserver/index",
+  "title": "MS SQL Server",
+  "description": "Project events from EventStoreDB to MS SQL Server or Azure SQL",
+  "source": "@site/docs/sinks/sqlserver/index.md",
+  "sourceDirName": "sinks/sqlserver",
+  "slug": "/sinks/sqlserver/",
+  "permalink": "/docs/sinks/sqlserver/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/eventuous/connectors/docs/edit/master/docs/sinks/sqlserver/index.md",
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "title": "MS SQL Server",
+    "description": "Project events from EventStoreDB to MS SQL Server or Azure SQL"
+  },
+  "sidebar": "defaultSidebar",
+  "previous": {
+    "title": "Elasticsearch",
+    "permalink": "/docs/sinks/elasticsearch/"
+  },
+  "next": {
+    "title": "Custom connector",
+    "permalink": "/docs/custom-connector/"
+  }
+}

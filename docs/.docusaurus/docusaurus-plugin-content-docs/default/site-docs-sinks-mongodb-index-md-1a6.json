@@ -1,0 +1,29 @@
+{
+  "id": "sinks/mongodb/index",
+  "title": "MongoDB",
+  "description": "Project events from EventStoreDB to MongoDB",
+  "source": "@site/docs/sinks/mongodb/index.md",
+  "sourceDirName": "sinks/mongodb",
+  "slug": "/sinks/mongodb/",
+  "permalink": "/docs/sinks/mongodb/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/eventuous/connectors/docs/edit/master/docs/sinks/mongodb/index.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "title": "MongoDB",
+    "description": "Project events from EventStoreDB to MongoDB",
+    "sidebar_position": 2
+  },
+  "sidebar": "defaultSidebar",
+  "previous": {
+    "title": "Generic gRPC",
+    "permalink": "/docs/sinks/grpc/"
+  },
+  "next": {
+    "title": "Elasticsearch",
+    "permalink": "/docs/sinks/elasticsearch/"
+  }
+}

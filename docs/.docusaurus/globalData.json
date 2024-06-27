@@ -1,0 +1,78 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/docs",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/docs",
+          "mainDocId": "intro",
+          "docs": [
+            {
+              "id": "custom-connector/index",
+              "path": "/docs/custom-connector/",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "deployment/index",
+              "path": "/docs/deployment/",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "intro",
+              "path": "/docs/intro",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "projectors/grpc/index",
+              "path": "/docs/projectors/grpc/",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "sinks/elasticsearch/index",
+              "path": "/docs/sinks/elasticsearch/",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "sinks/grpc/index",
+              "path": "/docs/sinks/grpc/",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "sinks/mongodb/index",
+              "path": "/docs/sinks/mongodb/",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "sinks/sqlserver/index",
+              "path": "/docs/sinks/sqlserver/",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "/category/projectors",
+              "path": "/docs/category/projectors",
+              "sidebar": "defaultSidebar"
+            },
+            {
+              "id": "/category/sinks",
+              "path": "/docs/category/sinks",
+              "sidebar": "defaultSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "defaultSidebar": {
+              "link": {
+                "path": "/docs/intro",
+                "label": "intro"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "sinks/grpc/index",
+  "title": "Generic gRPC",
+  "description": "Send events to gRPC endpoint",
+  "source": "@site/docs/sinks/grpc/index.md",
+  "sourceDirName": "sinks/grpc",
+  "slug": "/sinks/grpc/",
+  "permalink": "/docs/sinks/grpc/",
+  "draft": false,
+  "unlisted": false,
+  "editUrl": "https://github.com/eventuous/connectors/docs/edit/master/docs/sinks/grpc/index.md",
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "title": "Generic gRPC",
+    "description": "Send events to gRPC endpoint",
+    "sidebar_position": 1
+  },
+  "sidebar": "defaultSidebar",
+  "previous": {
+    "title": "Sinks",
+    "permalink": "/docs/category/sinks"
+  },
+  "next": {
+    "title": "MongoDB",
+    "permalink": "/docs/sinks/mongodb/"
+  }
+}
