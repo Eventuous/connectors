@@ -10,32 +10,31 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
     {
-        title: 'Domain and persistence',
+        title: 'Projections',
         // Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
         description: (
             <>
-                Event-sourced Aggregate base classes and Aggregate Store building blocks to build your domain model,
-                and persist state transitions as events using EventStoreDB, PostgreSQL and Microsoft SQL Server.
+                Projecting events to document and relational databases using ready-made components and building blocks.
+                Use your own code and the Connector Sidecar to create new representations of your system state.
             </>
         ),
     },
     {
-        title: 'Subscriptions',
+        title: 'Streaming',
         // Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
         description: (
             <>
-                Real-time subscriptions to support event reactors and read model projections,
-                using EventStoreDB, PostgreSQL, Microsoft SQL Server, Google PubSub, and RabbitMQ.
+                Real-time message streaming from EventStoreDB to HTTP or gRPC endpoints or custom sinks.
             </>
         ),
     },
     {
-        title: 'Messaging',
+        title: 'Observability',
         // Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
         description: (
             <>
-                Produce and consume messages using EventStoreDB, PostgreSQL, Microsoft SQL Server, Google PubSub,
-                and RabbitMQ.
+                Top-down observability with OpenTelemetry built-in, with configurable exporters to Prometheus, OTLP protocol,
+                Jaeger or Zipkin.
             </>
         ),
     },
