@@ -46,8 +46,8 @@ The `tier` section is used to configure the rollover policy tiers. The tier name
     * `maxDocs` - the maximum index documents
 * `forceMerge` - the force merge policy section
     * `maxNumSegments` - the maximum number of segments
-* `readOnly` - if the tier will be read only
-* `delete` - if the tier will be deleted
+* `readOnly` - if the tier is read-only
+* `delete` - if the tier is deleted
 
 ## Producer mode
 

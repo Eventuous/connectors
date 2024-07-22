@@ -15,7 +15,7 @@ Both samples contain the following:
 - Code generated from proto-files by language-specific Protobuf transpiler
 - MongoDB-oriented projections DSL for some of the supported operations
 - Bootstrap code for the gRPC server
-- Actual projections for events produced by the [sample app](https://github.com/Eventuous/eventuous/samples)
+- Actual projections for events produced by the [sample app][sample]
 
 Those examples can help you to understand the concept and implement your own projectors.
 
@@ -76,7 +76,8 @@ export const sqlProjections: Projector = [
 
 ## Configuration
 
-There are two sections to configure in the [Connector configuration](../../deployment/#configuration): `target` and `grpc`. The `target` section specified the SQL Server configuration, and the `grpc` section contains the sidecar URL (your service).
+There are two sections to configure in the [Connector configuration](../../deployment/index.md#configuration): `target` and `grpc`. 
+The `target` section specified the SQL Server configuration, and the `grpc` section contains the sidecar URL (your service).
 
 For the SQL Server sink, you need to configure the following parameters:
 
@@ -109,3 +110,4 @@ grpc:
 ```
 
 [1]: https://github.com/Eventuous/connector-sidecar-nodejs-sqlserver
+[sample]: https://github.com/Eventuous/eventuous/tree/3969b05d75e296b46599aad125122abcd9ffc793/samples/esdb

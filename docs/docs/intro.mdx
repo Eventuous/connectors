@@ -9,7 +9,7 @@ import dpDark from './images/connector-grpc-concept-dark.png';
 import sqlLight from './images/connector-sql-projector.png';
 import sqlDark from './images/connector-sql-projector-dark.png';
 
-Eventuous connectors allow subscribing to events from EventStoreDB (source) and produce derived events to another system (sink). Some sinks also support reduce-like operations that work as [projections](https://eventuous.dev/docs/read-models/rm-concept).
+Eventuous connectors allow subscribing to events from EventStoreDB (source) and produce derived events to another system (sink). Some sinks also support reduce-like operations that work as [projections][1].
 
 The Connector is a combination of a real-time subscription (currently only to `$all` stream) and a sink. A sink can be configured to produce (producer mode) or to project (projector mode) events. Some sinks support both modes, some only support one.
 
@@ -24,8 +24,8 @@ Currently, the following sinks are supported:
 
 :::info
 Because the Connector uses all the features of Eventuous, it is able to execute both produce and project
-operations in parallel using the [partitioning filter](https://eventuous.dev/docs/subscriptions/pipes/#partitioning-filter). The only
-partition key supported right now is the **stream name**. In addition, each sink is fully instrumented for
+operations in parallel using the [partitioning filter][2].
+The only partition key supported right now is the **stream name**. In addition, each sink is fully instrumented for
 observability with traces and metrics.
 :::
 
@@ -44,7 +44,7 @@ look like on the other side depends on the sink implementation.
 
 The producer mode is most useful for re-publishing domain events to a broker, or to be used as
 an archive or backup. For example, the Elasticsearch sink can be used in combination with
-the [archive event store](https://eventuous.dev/docs/persistence/aggregate-store/#multi-tier-store) to keep archived events in a cheaper
+the [archive event store][3] to keep archived events in a cheaper
 persistence tier, whilst keeping the EventStoreDB database size contained.
 
 When used in combination with a message bus sink, the connector can be used to publish integration events for
@@ -55,7 +55,7 @@ still [build a custom connector](custom-connector) for that purpose.
 ### Projector mode
 
 The _projector_ mode allows implementing projections that are built using other stacks than .NET. Basically,
-the projector mode implements the [MapReduce](https://en.wikipedia.org/wiki/MapReduce) pattern. Using a
+the projector mode implements the [MapReduce][4] pattern. Using a
 projector, you can reduce events to a single piece of state using some unique key.
 
 Because the reduce function requires custom implementation, Eventuous Connector needs to call some custom code
@@ -100,3 +100,7 @@ lifting. Each sink also provides observability instrumentation for the database 
 
 Refer to the specific connector documentation page for more information.
 
+[1]: https://eventuous.dev/docs/read-models/rm-concept
+[2]: https://eventuous.dev/docs/subscriptions/pipes/#partitioning-filter
+[3]: https://eventuous.dev/docs/persistence/event-store#event-store-with-archive
+[4]: https://en.wikipedia.org/wiki/MapReduce

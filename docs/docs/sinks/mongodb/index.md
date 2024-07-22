@@ -18,7 +18,7 @@ Both samples contain the following:
 - Code generated from proto-files by language-specific Protobuf transpiler
 - MongoDB-oriented projections DSL for some of the supported operations
 - Bootstrap code for the gRPC server
-- Actual projections for events produced by the [sample app](https://github.com/Eventuous/eventuous/samples)
+- Actual projections for events produced by the [sample app][sample]
 
 Those examples can help you to understand the concept and implement your own projectors.
 
@@ -62,7 +62,8 @@ message DeleteMany {
 
 ## Configuration
 
-There are two sections to configure in the [Connector configuration](../../deployment/#configuration): `target` and `grpc`. The `target` section specified the MongoDB configuration, and the `grpc` section contains the sidecar URL.
+There are two sections to configure in the [Connector configuration](../../deployment/index.md#configuration): `target` and `grpc`. 
+The `target` section specified the MongoDB configuration, and the `grpc` section contains the sidecar URL.
 
 For the MongoDB target, you need to configure the following parameters:
 
@@ -100,3 +101,4 @@ grpc:
 
 [1]: https://github.com/Eventuous/connector-sidecar-nodejs-mongo
 [2]: https://github.com/Eventuous/connector-sidecar-php-mongo
+[sample]: https://github.com/Eventuous/eventuous/tree/3969b05d75e296b46599aad125122abcd9ffc793/samples/esdb
